@@ -2,7 +2,7 @@ import os
 import time
 from typing import Any
 
-import requests
+import httpx
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -30,7 +30,7 @@ def _cached_get(path: str, params: dict[str, str] | None = None) -> Any:
         if now - cached_at < _CACHE_TTL_SECONDS:
             return payload
 
-    response = requests.get(url, headers=_auth_headers(), params=params, timeout=30)
+    response = httpx.get(url, headers=_auth_headers(), params=params, timeout=30)
     response.raise_for_status()
     payload = response.json()
     _cache[cache_key] = (now, payload)
