@@ -6,6 +6,7 @@ from sqlmodel import SQLModel, Field, Session
 from database import create_db_and_tables, get_session
 from datetime import datetime, timezone
 from enum import Enum
+from fastapi.middleware.cors import CORSMiddleware
 
 load_dotenv()
 
@@ -29,6 +30,7 @@ class MovieEntry(SQLModel, table=True):
     updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 app = FastAPI()
+app.add_middleware(CORSMiddleware, allow_origins=["http://localhost:5173"], allow_credentials=True, allow_methods=["*"], allow_headers=["*"])
 
 @app.on_event("startup")
 def on_startup():
