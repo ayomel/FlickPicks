@@ -9,7 +9,7 @@ class WatchlistStatus(str, Enum):
     WATCHED = "watched"
 
 
-class WatchlistEntry(SQLModel, table=True):
+class Watchlist(SQLModel, table=True):
     __tablename__ = "watchlist_entries"
 
     id: int | None = Field(default=None, primary_key=True)

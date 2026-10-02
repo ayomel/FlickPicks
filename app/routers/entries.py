@@ -5,7 +5,7 @@ from sqlmodel import Session, select
 
 from app.tmdb import get_movie
 from app.database import get_db
-from app.models import WatchlistEntry
+from app.models import Watchlist
 from app.schemas import WatchlistEntryCreate, WatchlistEntryRead, WatchlistEntryUpdate
 
 router = APIRouter(tags=["entries"])
@@ -13,12 +13,12 @@ router = APIRouter(tags=["entries"])
 
 @router.get("/entry", response_model=list[WatchlistEntryRead])
 def list_entries(session: Session = Depends(get_db)):
-    return session.exec(select(WatchlistEntry)).all()
+    return session.exec(select(Watchlist)).all()
 
 
 @router.post("/entry", response_model=WatchlistEntryRead)
 def create_entry(body: WatchlistEntryCreate, session: Session = Depends(get_db)):
-    entry = WatchlistEntry.model_validate(body)
+    entry = Watchlist.model_validate(body)
     session.add(entry)
     session.commit()
     session.refresh(entry)
@@ -27,7 +27,7 @@ def create_entry(body: WatchlistEntryCreate, session: Session = Depends(get_db))
 
 @router.get("/entry/{entry_id}")
 def get_entry(entry_id: int, session: Session = Depends(get_db)):
-    entry = session.get(WatchlistEntry, entry_id)
+    entry = session.get(Watchlist, entry_id)
     movie = get_movie(entry.tmdb_id)
     if entry is None:
         raise HTTPException(status_code=404, detail="Entry not found")
@@ -40,7 +40,7 @@ def update_entry(
     body: WatchlistEntryUpdate,
     session: Session = Depends(get_db),
 ):
-    entry = session.get(WatchlistEntry, entry_id)
+    entry = session.get(Watchlist, entry_id)
     if entry is None:
         raise HTTPException(status_code=404, detail="Entry not found")
 
@@ -57,7 +57,7 @@ def update_entry(
 
 @router.delete("/entry/{entry_id}", status_code=204)
 def delete_entry(entry_id: int, session: Session = Depends(get_db)):
-    entry = session.get(WatchlistEntry, entry_id)
+    entry = session.get(Watchlist, entry_id)
     if entry is None:
         raise HTTPException(status_code=404, detail="Entry not found")
     session.delete(entry)
