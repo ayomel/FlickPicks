@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException
-import httpx
+from httpx import HTTPStatusError
 
 from app import tmdb
 
@@ -10,7 +10,7 @@ router = APIRouter(tags=["browse"])
 def get_movie(movie_id: int):
     try:
         return tmdb.get_movie(movie_id)
-    except httpx.HTTPStatusError as exc:
+    except HTTPStatusError as exc:
         raise HTTPException(status_code=exc.response.status_code, detail="TMDB request failed") from exc
 
 
@@ -18,7 +18,7 @@ def get_movie(movie_id: int):
 def get_trending_movies():
     try:
         return tmdb.get_trending_movies()
-    except httpx.HTTPStatusError as exc:
+    except HTTPStatusError as exc:
         raise HTTPException(status_code=exc.response.status_code, detail="TMDB request failed") from exc
 
 
@@ -26,5 +26,5 @@ def get_trending_movies():
 def search_movies(query: str):
     try:
         return tmdb.search_movies(query)
-    except httpx.HTTPStatusError as exc:
+    except HTTPStatusError as exc:
         raise HTTPException(status_code=exc.response.status_code, detail="TMDB request failed") from exc
