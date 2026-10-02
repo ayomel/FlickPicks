@@ -3,6 +3,7 @@ from datetime import datetime, timezone
 from fastapi import APIRouter, Depends, HTTPException
 from sqlmodel import Session, select
 
+from app.tmdb import get_movie
 from app.database import get_db
 from app.models import WatchlistEntry
 from app.schemas import WatchlistEntryCreate, WatchlistEntryRead, WatchlistEntryUpdate
@@ -24,12 +25,13 @@ def create_entry(body: WatchlistEntryCreate, session: Session = Depends(get_db))
     return entry
 
 
-@router.get("/entry/{entry_id}", response_model=WatchlistEntryRead)
+@router.get("/entry/{entry_id}")
 def get_entry(entry_id: int, session: Session = Depends(get_db)):
     entry = session.get(WatchlistEntry, entry_id)
+    movie = get_movie(entry.tmdb_id)
     if entry is None:
         raise HTTPException(status_code=404, detail="Entry not found")
-    return entry
+    return {**entry.model_dump(), "movie": movie}
 
 
 @router.patch("/entry/{entry_id}", response_model=WatchlistEntryRead)
