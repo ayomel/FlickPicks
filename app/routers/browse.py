@@ -9,7 +9,10 @@ router = APIRouter(tags=["browse"])
 @router.get("/movies/{movie_id}")
 def get_movie(movie_id: int):
     try:
-        return tmdb.get_movie(movie_id)
+        movie = tmdb.get_movie(movie_id)
+        providers = tmdb.get_movie_watch_providers(movie_id)
+        us_providers = providers.get("results", {}).get("US", {})
+        return {**movie, "watch_providers": us_providers}
     except HTTPStatusError as exc:
         raise HTTPException(status_code=exc.response.status_code, detail="TMDB request failed") from exc
 
