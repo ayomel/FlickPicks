@@ -4,6 +4,10 @@ version = "0.1.0"
 requires-python = ">=3.11"
 dependencies = [
     "fastapi[all,standard]>=0.142.0",
+    "python-dotenv>=1.0.0",
     "requests>=2.34.2",
     "sqlmodel>=0.0.47",
 ]
+
+[tool.fastapi]
+app = "app.main:app"

@@ -1,0 +1,33 @@
+from datetime import datetime
+
+from pydantic import BaseModel, ConfigDict, Field
+
+from app.models import WatchlistStatus
+
+
+class WatchlistEntryCreate(BaseModel):
+    tmdb_id: int
+    status: WatchlistStatus = WatchlistStatus.WANT
+    rating: int | None = Field(default=None, ge=1, le=10)
+    review: str = ""
+    added_by: str = ""
+
+
+class WatchlistEntryUpdate(BaseModel):
+    status: WatchlistStatus | None = None
+    rating: int | None = Field(default=None, ge=1, le=10)
+    review: str | None = None
+    added_by: str | None = None
+
+
+class WatchlistEntryRead(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    tmdb_id: int
+    status: WatchlistStatus
+    rating: int | None
+    review: str
+    added_by: str
+    created_at: datetime
+    updated_at: datetime
