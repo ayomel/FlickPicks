@@ -12,7 +12,9 @@ def get_movie(movie_id: int):
         movie = tmdb.get_movie(movie_id)
         providers = tmdb.get_movie_watch_providers(movie_id)
         us_providers = providers.get("results", {}).get("US", {})
-        return {**movie, "watch_providers": us_providers}
+        videos = movie.get("videos", {}).get("results", [])
+        trailer = tmdb.get_trailer_url(videos)
+        return {**movie, "streaming_providers": us_providers, "trailer": trailer}
     except HTTPStatusError as exc:
         raise HTTPException(status_code=exc.response.status_code, detail="TMDB request failed") from exc
 

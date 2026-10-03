@@ -37,8 +37,28 @@ def _cached_get(path: str, params: dict[str, str] | None = None) -> Any:
     return payload
 
 
+def get_trailer_url(videos: list[dict]) -> str | None:
+    youtube_trailers = [
+        video
+        for video in videos
+        if video.get("site") == "YouTube" and video.get("type") == "Trailer"
+    ]
+    if not youtube_trailers:
+        return None
+
+    official = [video for video in youtube_trailers if video.get("official") is True]
+    chosen = official[0] if official else youtube_trailers[0]
+    key = chosen.get("key")
+    if not key:
+        return None
+    return f"https://www.youtube.com/watch?v={key}"
+
+
 def get_movie(movie_id: int) -> Any:
-    return _cached_get(f"/movie/{movie_id}")
+    return _cached_get(
+        f"/movie/{movie_id}",
+        params={"append_to_response": "videos"},
+    )
 
 
 def get_movie_watch_providers(movie_id: int) -> Any:
