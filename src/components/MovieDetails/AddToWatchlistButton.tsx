@@ -1,6 +1,7 @@
 import { Check, Plus } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useAddToWatchlistMutation } from '@/hooks/useAddToWatchlistMutation'
+import { useRemoveFromWatchlistMutation } from '@/hooks/useRemoveFromWatchlistMutation'
 import { useIsMovieOnWatchlist } from '@/hooks/useWatchlistQuery'
 import { cn } from '@/lib/utils'
 
@@ -15,33 +16,50 @@ export const AddToWatchlistButton = ({
 }: AddToWatchlistButtonProps) => {
   const { isOnWatchlist, isLoading: watchlistLoading } =
     useIsMovieOnWatchlist(movieId)
-  const { mutate, isPending, isSuccess, isError } = useAddToWatchlistMutation()
+  const addMutation = useAddToWatchlistMutation()
+  const removeMutation = useRemoveFromWatchlistMutation()
 
-  const onWatchlist = isOnWatchlist || isSuccess
+  const isAdding = addMutation.isPending
+  const isRemoving = removeMutation.isPending
+  const isPending = isAdding || isRemoving
+  const isError = addMutation.isError || removeMutation.isError
 
   const label = watchlistLoading
     ? 'Watchlist…'
-    : onWatchlist
-      ? 'On watchlist'
-      : isPending
+    : isRemoving
+      ? 'Removing…'
+      : isAdding
         ? 'Adding…'
-        : isError
-          ? 'Try again'
-          : addLabel
+        : isOnWatchlist
+          ? 'On watchlist'
+          : isError
+            ? 'Try again'
+            : addLabel
+
+  const handlePress = () => {
+    if (isOnWatchlist) {
+      removeMutation.mutate(movieId)
+    } else {
+      addMutation.mutate(movieId)
+    }
+  }
 
   return (
     <Button
       variant="secondary"
-      isDisabled={watchlistLoading || onWatchlist || isPending}
-      onPress={() => mutate(movieId)}
+      isDisabled={watchlistLoading || isPending}
+      onPress={handlePress}
       aria-live="polite"
-      aria-pressed={onWatchlist}
+      aria-pressed={isOnWatchlist}
+      aria-label={
+        isOnWatchlist ? 'Remove from watchlist' : 'Add to watchlist'
+      }
       className={cn(
-        onWatchlist &&
-          'border-brand/30 bg-brand-soft text-brand hover:bg-brand-soft',
+        isOnWatchlist &&
+          'border-brand/30 bg-brand-soft text-brand hover:border-border hover:bg-muted hover:text-foreground',
       )}
     >
-      {onWatchlist ? (
+      {isOnWatchlist ? (
         <Check data-icon="inline-start" />
       ) : (
         <Plus data-icon="inline-start" />
