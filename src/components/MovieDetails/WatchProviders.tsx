@@ -43,9 +43,7 @@ const ProviderGroup = ({
 
 export const WatchProviders = ({ providers }: WatchProvidersProps) => {
   const stream = providers?.flatrate ?? []
-  const rent = providers?.rent ?? []
-  const buy = providers?.buy ?? []
-  const hasAny = stream.length + rent.length + buy.length > 0
+  const hasAny = stream.length > 0
 
   if (!hasAny) {
     return (
@@ -63,8 +61,6 @@ export const WatchProviders = ({ providers }: WatchProvidersProps) => {
       <SectionLabel className="mb-6">Where to watch</SectionLabel>
       <div className="flex flex-col gap-8 sm:flex-row sm:flex-wrap sm:gap-12">
         <ProviderGroup label="Stream" items={stream} />
-        <ProviderGroup label="Rent" items={rent} />
-        <ProviderGroup label="Buy" items={buy} />
       </div>
     </PageSection>
   )
