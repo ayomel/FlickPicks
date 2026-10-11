@@ -1,38 +1,47 @@
-import { useEffect } from 'react'
 import { Check, Plus } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useAddToWatchlistMutation } from '@/hooks/useAddToWatchlistMutation'
+import { useIsMovieOnWatchlist } from '@/hooks/useWatchlistQuery'
+import { cn } from '@/lib/utils'
 
 type AddToWatchlistButtonProps = {
   movieId: number
+  addLabel?: string
 }
 
-export const AddToWatchlistButton = ({ movieId }: AddToWatchlistButtonProps) => {
-  const { mutate, isPending, isSuccess, isError, reset } =
-    useAddToWatchlistMutation()
+export const AddToWatchlistButton = ({
+  movieId,
+  addLabel = 'Add to watchlist',
+}: AddToWatchlistButtonProps) => {
+  const { isOnWatchlist, isLoading: watchlistLoading } =
+    useIsMovieOnWatchlist(movieId)
+  const { mutate, isPending, isSuccess, isError } = useAddToWatchlistMutation()
 
-  useEffect(() => {
-    if (!isSuccess) return
-    const timer = window.setTimeout(() => reset(), 2500)
-    return () => window.clearTimeout(timer)
-  }, [isSuccess, reset])
+  const onWatchlist = isOnWatchlist || isSuccess
 
-  const label = isPending
-    ? 'Adding…'
-    : isSuccess
-      ? 'Added to watchlist'
-      : isError
-        ? 'Try again'
-        : 'Add to watchlist'
+  const label = watchlistLoading
+    ? 'Watchlist…'
+    : onWatchlist
+      ? 'On watchlist'
+      : isPending
+        ? 'Adding…'
+        : isError
+          ? 'Try again'
+          : addLabel
 
   return (
     <Button
       variant="secondary"
-      isDisabled={isPending || isSuccess}
+      isDisabled={watchlistLoading || onWatchlist || isPending}
       onPress={() => mutate(movieId)}
       aria-live="polite"
+      aria-pressed={onWatchlist}
+      className={cn(
+        onWatchlist &&
+          'border-brand/30 bg-brand-soft text-brand hover:bg-brand-soft',
+      )}
     >
-      {isSuccess ? (
+      {onWatchlist ? (
         <Check data-icon="inline-start" />
       ) : (
         <Plus data-icon="inline-start" />
