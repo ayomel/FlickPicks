@@ -58,4 +58,28 @@ export type SearchMovie = {
   vote_count: number
 }
 
-export type SearchResponse = SearchMovie[]
+/** TMDB movie search hit (list endpoint). */
+export type SearchMovieResult = {
+  adult: boolean
+  backdrop_path: string | null
+  genre_ids: number[]
+  id: number
+  original_language: string
+  original_title: string
+  overview: string
+  popularity: number
+  poster_path: string | null
+  release_date: string
+  softcore: boolean
+  title: string
+  video: boolean
+  vote_average: number
+  vote_count: number
+}
+
+export type SearchMoviesResponse = {
+  page: number
+  results: SearchMovieResult[]
+  total_pages?: number
+  total_results?: number
+}
