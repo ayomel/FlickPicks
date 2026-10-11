@@ -1,4 +1,5 @@
-import { Info, Plus } from 'lucide-react'
+import { Info } from 'lucide-react'
+import { AddToWatchlistButton } from '@/components/MovieDetails/AddToWatchlistButton'
 import { Button } from '@/components/ui/button'
 import type { FeaturedMovie } from '@/types/trending'
 import { Link } from 'react-router-dom'
@@ -16,15 +17,7 @@ export const MovieActions = ({ movie }: MovieActionsProps) => {
           View details
         </Button>
       </Link>
-      <Button
-        variant="secondary"
-        onPress={() => {
-          console.log('watchlist', movie.id, movie.title)
-        }}
-      >
-        <Plus data-icon="inline-start" />
-        Watchlist
-      </Button>
+      <AddToWatchlistButton movieId={movie.id} addLabel="Watchlist" />
     </div>
   )
 }
