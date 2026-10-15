@@ -16,6 +16,13 @@ const movie = {
   ],
   poster_path: '/p.jpg',
   budget: 63_000_000,
+  runtime: 136,
+  status: 'Released',
+  release_date: '1999-03-31',
+  original_language: 'en',
+  spoken_languages: [
+    { english_name: 'English', iso_639_1: 'en', name: 'English' },
+  ],
   production_companies: [
     { id: 1, name: 'Warner Bros.', logo_path: null, origin_country: 'US' },
   ],
@@ -28,11 +35,18 @@ describe('MovieDetailsInfo', () => {
   it('renders the side panel details and hides a zero budget', () => {
     render(<MovieDetailsInfo movie={movie} />)
 
-    expect(screen.getByText('Action')).toBeInTheDocument()
-    expect(screen.getByText('Science Fiction')).toBeInTheDocument()
-    expect(screen.getByText('United States of America')).toBeInTheDocument()
-    expect(screen.getByText('Warner Bros.')).toBeInTheDocument()
-    expect(screen.getByText('$63M')).toBeInTheDocument()
+    expect(screen.getAllByText('Action').length).toBeGreaterThan(0)
+    expect(screen.getAllByText('Science Fiction').length).toBeGreaterThan(0)
+    expect(
+      screen.getAllByText('United States of America').length,
+    ).toBeGreaterThan(0)
+    expect(screen.getAllByText('Warner Bros.').length).toBeGreaterThan(0)
+    expect(screen.getAllByText('$63M').length).toBeGreaterThan(0)
+    expect(screen.getAllByText('Release date').length).toBeGreaterThan(0)
+    expect(screen.getAllByText('Runtime').length).toBeGreaterThan(0)
+    expect(screen.getAllByText('Status').length).toBeGreaterThan(0)
+    expect(screen.getAllByText('Language').length).toBeGreaterThan(0)
+    expect(screen.getAllByText('English').length).toBeGreaterThan(0)
 
     cleanup()
     render(
@@ -49,18 +63,26 @@ describe('MovieDetailsInfo', () => {
     expect(screen.queryByText('$63M')).not.toBeInTheDocument()
   })
 
-  it('loads the sidebar poster eagerly', () => {
+  it('loads the lg sidebar poster eagerly and the mobile card lazily', () => {
     render(<MovieDetailsInfo movie={movie} />)
 
-    expect(
-      screen.getByRole('img', { name: 'The Matrix poster' }),
-    ).toHaveAttribute('loading', 'eager')
+    const posters = screen.getAllByRole('img', { name: 'The Matrix poster' })
+    expect(posters.some((img) => img.getAttribute('loading') === 'eager')).toBe(
+      true,
+    )
+    expect(posters.some((img) => img.getAttribute('loading') === 'lazy')).toBe(
+      true,
+    )
   })
 
   it('falls back to the Film icon when the poster fails', () => {
     render(<MovieDetailsInfo movie={movie} />)
 
-    fireEvent.error(screen.getByRole('img', { name: 'The Matrix poster' }))
+    for (const img of screen.getAllByRole('img', {
+      name: 'The Matrix poster',
+    })) {
+      fireEvent.error(img)
+    }
     expect(
       screen.queryByRole('img', { name: 'The Matrix poster' }),
     ).not.toBeInTheDocument()
