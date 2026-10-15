@@ -73,11 +73,17 @@ describe('VideosRow', () => {
     )
   })
 
-  it('falls back to an icon when a thumbnail fails', () => {
+  it('drops the broken thumbnail and keeps the play control', () => {
     render(<VideosRow movie={movie} />)
 
     fireEvent.error(screen.getByRole('presentation'))
     expect(screen.queryByRole('presentation')).not.toBeInTheDocument()
-    expect(document.querySelector('svg')).toBeTruthy()
+    expect(
+      screen
+        .getByRole('button', {
+          name: 'Play Official Trailer, Trailer, Official',
+        })
+        .querySelector('svg'),
+    ).toBeTruthy()
   })
 })

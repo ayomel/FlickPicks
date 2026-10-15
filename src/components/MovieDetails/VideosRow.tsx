@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Film, Play } from 'lucide-react'
+import { Play } from 'lucide-react'
 import { MediaRow, type MediaRowItemOptions } from '@/components/Row/MediaRow'
 import type { MovieDetails, MovieVideo } from '@/types/movieDetails'
 import { getYoutubeThumbUrl, getYoutubeVideos } from '@/utils/formatMovie'
@@ -39,11 +39,7 @@ const VideoCard = ({ video, tabIndex, onFocus, onSelect }: VideoCardProps) => {
       )}
     >
       <div className="relative aspect-video overflow-hidden bg-muted">
-        {imageFailed ? (
-          <div className="flex size-full items-center justify-center bg-muted">
-            <Film className="size-8 text-muted-foreground" aria-hidden />
-          </div>
-        ) : (
+        {!imageFailed ? (
           <img
             src={getYoutubeThumbUrl(video.key)}
             alt=""
@@ -57,7 +53,7 @@ const VideoCard = ({ video, tabIndex, onFocus, onSelect }: VideoCardProps) => {
               '[@media(hover:hover)]:group-hover/card:scale-105',
             )}
           />
-        )}
+        ) : null}
         <span className="pointer-events-none absolute inset-0 flex items-center justify-center bg-background/25">
           <span className="flex size-12 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-md">
             <Play className="size-5 fill-current" aria-hidden />

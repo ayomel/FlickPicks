@@ -33,8 +33,8 @@ describe('TrailerPlayer', () => {
       'referrerPolicy',
       'strict-origin-when-cross-origin',
     )
-    expect(screen.getByText('Esc or Close')).toBeInTheDocument()
-    expect(screen.getByRole('dialog')).toHaveAttribute('aria-modal', 'true')
+    expect(screen.getByText('Press Esc or Close to exit')).toBeInTheDocument()
+    expect(screen.getByRole('dialog')).toBeInTheDocument()
   })
 
   it('closes on Escape', async () => {

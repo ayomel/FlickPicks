@@ -92,7 +92,7 @@ export const getYoutubeVideos = (movie: MovieDetails) => {
     .sort((a, b) => {
       const groupDiff = youtubeVideoGroup(a) - youtubeVideoGroup(b)
       if (groupDiff !== 0) return groupDiff
-      return b.published_at.localeCompare(a.published_at)
+      return (b.published_at ?? '').localeCompare(a.published_at ?? '')
     })
 }
 
