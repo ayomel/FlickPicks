@@ -49,8 +49,6 @@ export const FeatureMovieHero = () => {
   return (
     <section
       className="relative min-h-svh overflow-hidden bg-background text-foreground"
-      onMouseEnter={() => setPaused(true)}
-      onMouseLeave={() => setPaused(false)}
       onFocusCapture={() => setPaused(true)}
       onBlurCapture={(event) => {
         const nextFocus = event.relatedTarget
@@ -67,22 +65,32 @@ export const FeatureMovieHero = () => {
         reducedMotion={reducedMotion}
       />
       <HeroOverlay />
-      <HeroContent>
-        <HeroRankTag rank={index + 1} />
-        <MovieYear releaseDate={movie.release_date} />
-        <MovieTitle title={movie.title} />
-        <MovieDescription overview={movie.overview} />
-        <MovieActions movie={movie} />
-      </HeroContent>
-      <HeroControls
-        index={index}
-        count={movies.length}
-        progress={progress}
-        playing={playing}
-        onPrev={prev}
-        onNext={next}
-        onGoTo={goTo}
-      />
+      <div
+        onMouseEnter={() => setPaused(true)}
+        onMouseLeave={() => setPaused(false)}
+      >
+        <HeroContent>
+          <HeroRankTag rank={index + 1} />
+          <MovieYear releaseDate={movie.release_date} />
+          <MovieTitle title={movie.title} />
+          <MovieDescription overview={movie.overview} />
+          <MovieActions movie={movie} />
+        </HeroContent>
+      </div>
+      <div
+        onMouseEnter={() => setPaused(true)}
+        onMouseLeave={() => setPaused(false)}
+      >
+        <HeroControls
+          index={index}
+          count={movies.length}
+          progress={progress}
+          playing={playing}
+          onPrev={prev}
+          onNext={next}
+          onGoTo={goTo}
+        />
+      </div>
     </section>
   )
 }
