@@ -7,34 +7,48 @@ afterEach(() => {
   cleanup()
 })
 
+const sampleItems = [
+  { id: 1, label: 'One' },
+  { id: 2, label: 'Two' },
+]
+
 describe('MediaRow', () => {
-  it('renders the label, title, and children', () => {
+  it('renders the label, title, and items', () => {
     render(
-      <MediaRow label="Trending" title="This week">
-        <li>
-          <a href="/movies/1">Card</a>
-        </li>
-      </MediaRow>,
+      <MediaRow
+        label="Trending"
+        title="This week"
+        items={sampleItems}
+        getKey={(item) => item.id}
+        renderItem={(item, { tabIndex }) => (
+          <a href={`/movies/${item.id}`} tabIndex={tabIndex}>
+            {item.label}
+          </a>
+        )}
+      />,
     )
 
     expect(screen.getByText('Trending')).toBeInTheDocument()
     expect(
       screen.getByRole('heading', { name: 'This week' }),
     ).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: 'Card' })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'One' })).toBeInTheDocument()
   })
 
   it('shows an error message when the row fails', () => {
     render(
-      <MediaRow label="Trending" title="This week" isError>
-        <li>
-          <a href="/movies/1">Card</a>
-        </li>
-      </MediaRow>,
+      <MediaRow
+        label="Trending"
+        title="This week"
+        items={sampleItems}
+        getKey={(item) => item.id}
+        isError
+        renderItem={(item) => <a href={`/movies/${item.id}`}>{item.label}</a>}
+      />,
     )
 
     expect(screen.getByText("Couldn't load this row.")).toBeInTheDocument()
-    expect(screen.queryByRole('link', { name: 'Card' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('link', { name: 'One' })).not.toBeInTheDocument()
   })
 
   it('shows an empty message and can hide the heading', () => {
@@ -42,12 +56,12 @@ describe('MediaRow', () => {
       <MediaRow
         label="Trending"
         title="This week"
-        isEmpty
+        items={[]}
+        getKey={(item: { id: number }) => item.id}
         emptyMessage="No trending movies right now."
         showHeading={false}
-      >
-        {null}
-      </MediaRow>,
+        renderItem={() => null}
+      />,
     )
 
     expect(
@@ -58,32 +72,57 @@ describe('MediaRow', () => {
     ).not.toBeInTheDocument()
   })
 
-  it('exposes a skip link and scroll controls', async () => {
+  it('exposes a skip link and mouse-only scroll controls at the ends', async () => {
     const user = userEvent.setup()
     const scrollBy = vi.fn()
 
     render(
-      <MediaRow label="Trending" title="This week">
-        <li>
-          <a href="/movies/1">One</a>
-        </li>
-        <li>
-          <a href="/movies/2">Two</a>
-        </li>
-      </MediaRow>,
+      <MediaRow
+        label="Trending"
+        title="This week"
+        items={sampleItems}
+        getKey={(item) => item.id}
+        renderItem={(item, { tabIndex }) => (
+          <a href={`/movies/${item.id}`} tabIndex={tabIndex}>
+            {item.label}
+          </a>
+        )}
+      />,
     )
 
     const list = screen.getByRole('list', { name: 'This week' })
-    Object.defineProperty(list, 'scrollBy', { value: scrollBy })
-    Object.defineProperty(list, 'clientWidth', { value: 400 })
+    Object.defineProperty(list, 'scrollBy', {
+      value: scrollBy,
+      configurable: true,
+    })
+    Object.defineProperty(list, 'clientWidth', {
+      value: 400,
+      configurable: true,
+    })
+    Object.defineProperty(list, 'scrollWidth', {
+      value: 1200,
+      configurable: true,
+    })
+    Object.defineProperty(list, 'scrollLeft', {
+      value: 0,
+      configurable: true,
+      writable: true,
+    })
+    list.dispatchEvent(new Event('scroll'))
 
     expect(
       screen.getByRole('link', { name: 'Skip This week' }),
     ).toBeInTheDocument()
 
-    await user.click(
-      screen.getByRole('button', { name: 'Scroll This week right' }),
-    )
+    const right = await screen.findByRole('button', {
+      name: 'Scroll This week right',
+    })
+    expect(
+      screen.queryByRole('button', { name: 'Scroll This week left' }),
+    ).not.toBeInTheDocument()
+    expect(right).toHaveAttribute('tabindex', '-1')
+
+    await user.click(right)
     expect(scrollBy).toHaveBeenCalled()
   })
 })

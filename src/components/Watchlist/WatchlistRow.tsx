@@ -14,6 +14,8 @@ export const WatchlistRow = () => {
     <MediaRow
       label="Your watchlist"
       title="Saved to watch"
+      items={movies}
+      getKey={(movie) => movie.id}
       isLoading={isLoadingMovies}
       isError={isError}
       errorMessage="Couldn't load your watchlist."
@@ -24,12 +26,14 @@ export const WatchlistRow = () => {
           </p>
         ) : null
       }
-    >
-      {movies.map((movie) => (
-        <li key={movie.id}>
-          <PosterCard movie={movie} />
-        </li>
-      ))}
-    </MediaRow>
+      renderItem={(movie, { tabIndex, onFocus, eager }) => (
+        <PosterCard
+          movie={movie}
+          tabIndex={tabIndex}
+          onFocus={onFocus}
+          eager={eager}
+        />
+      )}
+    />
   )
 }

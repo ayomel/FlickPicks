@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, type FocusEventHandler } from 'react'
 import { Film } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { cn } from '@/lib/utils'
@@ -16,11 +16,25 @@ export type BackdropCardMovie = {
 type BackdropCardProps = {
   movie: BackdropCardMovie
   tabIndex?: number
+  onFocus?: FocusEventHandler<HTMLAnchorElement>
+  /** Prefer eager for the first visible cards in an above-the-fold row. */
+  eager?: boolean
 }
 
-export const BackdropCard = ({ movie, tabIndex }: BackdropCardProps) => {
+const BACKDROP_WIDTH = 780
+const BACKDROP_HEIGHT = 439
+const POSTER_WIDTH = 342
+const POSTER_HEIGHT = 513
+
+export const BackdropCard = ({
+  movie,
+  tabIndex,
+  onFocus,
+  eager = false,
+}: BackdropCardProps) => {
   const [imageFailed, setImageFailed] = useState(false)
   const year = movie.release_date ? formatReleaseYear(movie.release_date) : null
+  const useBackdrop = Boolean(movie.backdrop_path)
   const imagePath = movie.backdrop_path ?? movie.poster_path
   const showImage = Boolean(imagePath) && !imageFailed
   const src = movie.backdrop_path
@@ -28,11 +42,14 @@ export const BackdropCard = ({ movie, tabIndex }: BackdropCardProps) => {
     : movie.poster_path
       ? getPosterCardPath(movie.poster_path)
       : null
+  const width = useBackdrop ? BACKDROP_WIDTH : POSTER_WIDTH
+  const height = useBackdrop ? BACKDROP_HEIGHT : POSTER_HEIGHT
 
   return (
     <Link
       to={`/movies/${movie.id}`}
       tabIndex={tabIndex}
+      onFocus={onFocus}
       className={cn(
         'group/card block w-64 shrink-0 snap-start sm:w-80',
         'outline-none focus-visible:ring-2 focus-visible:ring-foreground/70 focus-visible:ring-offset-2 focus-visible:ring-offset-background',
@@ -48,6 +65,10 @@ export const BackdropCard = ({ movie, tabIndex }: BackdropCardProps) => {
           <img
             src={src}
             alt=""
+            width={width}
+            height={height}
+            loading={eager ? 'eager' : 'lazy'}
+            decoding="async"
             onError={() => setImageFailed(true)}
             className={cn(
               'size-full object-cover transition-transform duration-200',

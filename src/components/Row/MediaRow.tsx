@@ -1,11 +1,9 @@
 import {
-  Children,
-  cloneElement,
-  isValidElement,
+  useEffect,
   useRef,
   useState,
+  type FocusEventHandler,
   type KeyboardEvent,
-  type ReactElement,
   type ReactNode,
 } from 'react'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
@@ -14,24 +12,28 @@ import { SectionLabel } from '@/components/ui/section-label'
 import { Skeleton } from '@/components/ui/skeleton'
 import { cn } from '@/lib/utils'
 
-type MediaRowProps = {
+export type MediaRowItemOptions = {
+  tabIndex: number
+  onFocus: FocusEventHandler<HTMLElement>
+  eager: boolean
+}
+
+type MediaRowProps<T> = {
   label: string
   title: string
-  children: ReactNode
+  items: T[]
+  getKey: (item: T) => string | number
+  renderItem: (item: T, options: MediaRowItemOptions) => ReactNode
   isLoading?: boolean
   isError?: boolean
-  isEmpty?: boolean
   emptyMessage?: string
   errorMessage?: string
   footer?: ReactNode
   className?: string
   variant?: 'poster' | 'backdrop'
   showHeading?: boolean
-}
-
-type FocusableCardProps = {
-  tabIndex?: number
-  onFocus?: () => void
+  /** First N cards load eagerly for LCP on above-the-fold rows. */
+  eagerCount?: number
 }
 
 const MediaRowSkeleton = ({ variant }: { variant: 'poster' | 'backdrop' }) => {
@@ -51,40 +53,53 @@ const MediaRowSkeleton = ({ variant }: { variant: 'poster' | 'backdrop' }) => {
   )
 }
 
-const injectCardProps = (
-  child: ReactNode,
-  props: FocusableCardProps,
-): ReactNode => {
-  if (!isValidElement(child)) return child
-
-  const element = child as ReactElement<{ children?: ReactNode }>
-  if (element.type === 'li' && isValidElement(element.props.children)) {
-    const card = element.props.children as ReactElement<FocusableCardProps>
-    return cloneElement(element, undefined, cloneElement(card, props))
-  }
-
-  return cloneElement(element as ReactElement<FocusableCardProps>, props)
-}
-
-export const MediaRow = ({
+export function MediaRow<T>({
   label,
   title,
-  children,
+  items,
+  getKey,
+  renderItem,
   isLoading = false,
   isError = false,
-  isEmpty = false,
   emptyMessage = 'Nothing here yet.',
   errorMessage = "Couldn't load this row.",
   footer,
   className,
   variant = 'poster',
   showHeading = true,
-}: MediaRowProps) => {
+  eagerCount = 0,
+}: MediaRowProps<T>) {
   const listRef = useRef<HTMLUListElement>(null)
   const [activeIndex, setActiveIndex] = useState(0)
-  const items = Children.toArray(children)
+  const [canScrollLeft, setCanScrollLeft] = useState(false)
+  const [canScrollRight, setCanScrollRight] = useState(false)
   const itemCount = items.length
+  const isEmpty = !isLoading && !isError && itemCount === 0
   const skipId = `after-${label}-${title}`.toLowerCase().replace(/\s+/g, '-')
+
+  const updateScrollState = () => {
+    const list = listRef.current
+    if (!list) return
+    const maxScroll = list.scrollWidth - list.clientWidth
+    setCanScrollLeft(list.scrollLeft > 1)
+    setCanScrollRight(maxScroll > 1 && list.scrollLeft < maxScroll - 1)
+  }
+
+  useEffect(() => {
+    if (isLoading || isError || isEmpty) return
+    const list = listRef.current
+    if (!list) return
+
+    updateScrollState()
+    list.addEventListener('scroll', updateScrollState, { passive: true })
+    const observer = new ResizeObserver(updateScrollState)
+    observer.observe(list)
+
+    return () => {
+      list.removeEventListener('scroll', updateScrollState)
+      observer.disconnect()
+    }
+  }, [isLoading, isError, isEmpty, itemCount])
 
   const scrollByCards = (direction: 1 | -1) => {
     const list = listRef.current
@@ -97,8 +112,14 @@ export const MediaRow = ({
     if (itemCount === 0) return
     const nextIndex = Math.min(itemCount - 1, Math.max(0, index))
     setActiveIndex(nextIndex)
+    const item = listRef.current?.querySelector(
+      `[data-row-index="${nextIndex}"]`,
+    )
     const target =
-      listRef.current?.querySelectorAll<HTMLElement>('a, button')[nextIndex]
+      item instanceof HTMLElement
+        ? (item.querySelector<HTMLElement>('a[href], button, [tabindex]') ??
+          item)
+        : null
     target?.focus()
     target?.scrollIntoView({
       behavior: 'smooth',
@@ -157,45 +178,71 @@ export const MediaRow = ({
                 Skip {title}
               </a>
 
-              <div className="relative">
-                <Button
-                  size="icon"
-                  variant="secondary"
-                  excludeFromTabOrder
-                  aria-label={`Scroll ${title} left`}
-                  className="absolute top-1/2 left-0 z-10 hidden size-10 -translate-y-1/2 sm:inline-flex"
-                  onPress={() => scrollByCards(-1)}
-                >
-                  <ChevronLeft />
-                </Button>
-                <Button
-                  size="icon"
-                  variant="secondary"
-                  excludeFromTabOrder
-                  aria-label={`Scroll ${title} right`}
-                  className="absolute top-1/2 right-0 z-10 hidden size-10 -translate-y-1/2 sm:inline-flex"
-                  onPress={() => scrollByCards(1)}
-                >
-                  <ChevronRight />
-                </Button>
+              <div className="flex items-center gap-2">
+                {canScrollLeft || canScrollRight ? (
+                  canScrollLeft ? (
+                    <Button
+                      size="icon"
+                      variant="secondary"
+                      excludeFromTabOrder
+                      aria-label={`Scroll ${title} left`}
+                      className="hidden size-10 shrink-0 sm:inline-flex"
+                      onPress={() => scrollByCards(-1)}
+                    >
+                      <ChevronLeft />
+                    </Button>
+                  ) : (
+                    <div
+                      className="hidden size-10 shrink-0 sm:block"
+                      aria-hidden
+                    />
+                  )
+                ) : null}
 
                 <ul
                   ref={listRef}
                   aria-label={title}
                   className={cn(
-                    'm-0 flex list-none gap-3 overflow-x-auto p-0 py-2',
+                    'm-0 flex min-w-0 flex-1 list-none gap-3 overflow-x-auto py-2',
                     'snap-x snap-mandatory scroll-smooth [scrollbar-width:thin]',
-                    'sm:px-12',
+                    'px-1 scroll-px-1 sm:scroll-px-12',
                   )}
                   onKeyDown={onListKeyDown}
                 >
-                  {items.map((child, index) =>
-                    injectCardProps(child, {
-                      tabIndex: index === activeIndex ? 0 : -1,
-                      onFocus: () => setActiveIndex(index),
-                    }),
-                  )}
+                  {items.map((item, index) => (
+                    <li
+                      key={getKey(item)}
+                      data-row-index={index}
+                      className="contents"
+                    >
+                      {renderItem(item, {
+                        tabIndex: index === activeIndex ? 0 : -1,
+                        onFocus: () => setActiveIndex(index),
+                        eager: index < eagerCount,
+                      })}
+                    </li>
+                  ))}
                 </ul>
+
+                {canScrollLeft || canScrollRight ? (
+                  canScrollRight ? (
+                    <Button
+                      size="icon"
+                      variant="secondary"
+                      excludeFromTabOrder
+                      aria-label={`Scroll ${title} right`}
+                      className="hidden size-10 shrink-0 sm:inline-flex"
+                      onPress={() => scrollByCards(1)}
+                    >
+                      <ChevronRight />
+                    </Button>
+                  ) : (
+                    <div
+                      className="hidden size-10 shrink-0 sm:block"
+                      aria-hidden
+                    />
+                  )
+                ) : null}
               </div>
 
               <div id={skipId} />
