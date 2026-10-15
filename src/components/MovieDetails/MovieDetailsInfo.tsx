@@ -47,7 +47,7 @@ export const MovieDetailsInfo = ({ movie }: MovieDetailsInfoProps) => {
         {showPoster && posterUrl ? (
           <img
             src={posterUrl}
-            alt=""
+            alt={`${movie.title} poster`}
             width={342}
             height={513}
             loading="lazy"

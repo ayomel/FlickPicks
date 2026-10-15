@@ -29,7 +29,7 @@ const ProviderTile = ({
         <span
           role="img"
           aria-label={provider.provider_name}
-          className="font-mono text-[0.65rem] font-semibold tracking-wide text-muted-foreground uppercase"
+          className="font-mono text-xs font-semibold tracking-wide text-muted-foreground uppercase"
         >
           {providerInitials(provider.provider_name)}
         </span>

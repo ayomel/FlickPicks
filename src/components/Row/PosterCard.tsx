@@ -52,7 +52,7 @@ export const PosterCard = ({
         {showImage && posterPath ? (
           <img
             src={getPosterCardPath(posterPath)}
-            alt=""
+            alt={`${movie.title} poster`}
             width={POSTER_WIDTH}
             height={POSTER_HEIGHT}
             loading={eager ? 'eager' : 'lazy'}

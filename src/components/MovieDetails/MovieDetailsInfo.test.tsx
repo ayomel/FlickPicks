@@ -52,8 +52,10 @@ describe('MovieDetailsInfo', () => {
   it('falls back to the Film icon when the poster fails', () => {
     render(<MovieDetailsInfo movie={movie} />)
 
-    fireEvent.error(screen.getByRole('presentation'))
-    expect(screen.queryByRole('presentation')).not.toBeInTheDocument()
+    fireEvent.error(screen.getByRole('img', { name: 'The Matrix poster' }))
+    expect(
+      screen.queryByRole('img', { name: 'The Matrix poster' }),
+    ).not.toBeInTheDocument()
     expect(document.querySelector('svg')).toBeTruthy()
   })
 })

@@ -11,7 +11,9 @@ import { TrailerPlayer } from '@/components/MovieDetails/TrailerPlayer'
 import { AddToWatchlistButton } from '@/components/MovieDetails/AddToWatchlistButton'
 import { VideosRow } from '@/components/MovieDetails/VideosRow'
 import { MoreTrendingRow } from '@/components/MovieDetails/MoreTrendingRow'
+import { Seo } from '@/components/Seo'
 import { isNumericMovieId } from '@/utils/isNumericMovieId'
+import { absoluteUrl, movieOgImageUrl } from '@/utils/seo'
 
 export const MovieDetails = () => {
   const { id } = useParams()
@@ -37,8 +39,18 @@ export const MovieDetails = () => {
     return <MovieDetailsError />
   }
 
+  const description =
+    data.overview?.trim() || `Details for ${data.title} on FlickPick.`
+
   return (
     <div className="min-h-svh bg-background pb-[calc(5.5rem+env(safe-area-inset-bottom))] text-foreground sm:pb-0">
+      <Seo
+        title={`${data.title} · FlickPick`}
+        description={description}
+        canonical={absoluteUrl(`/movies/${data.id}`)}
+        ogType="video.movie"
+        ogImage={movieOgImageUrl(data)}
+      />
       <MovieHero movie={data} />
 
       <div className="px-6 py-10 sm:px-8 lg:px-10">

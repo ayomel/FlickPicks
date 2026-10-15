@@ -11,5 +11,5 @@
     "verbatimModuleSyntax": true,
     "isolatedModules": true
   },
-  "include": ["./index.ts", "./routes.ts"]
+  "include": ["./index.ts", "./routes.ts", "./meta.ts"]
 }
