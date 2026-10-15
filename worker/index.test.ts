@@ -252,6 +252,21 @@ describe('worker fetch handler', () => {
     expect(html).not.toContain('property="og:title"')
   })
 
+  it('returns 404 with the SPA shell when the movie API responds 404', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue(new Response('missing', { status: 404 })),
+    )
+
+    const response = await handle('/movies/999999', envWith(files))
+    const html = await response.text()
+
+    expect(response.status).toBe(404)
+    expect(html).toContain('id="root"')
+    expect(html).toContain('<title>FlickPick</title>')
+    expect(html).not.toContain('property="og:title"')
+  })
+
   it('falls back to the plain shell when the movie API fetch hangs past timeout', async () => {
     vi.stubGlobal(
       'fetch',

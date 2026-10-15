@@ -140,6 +140,7 @@ describe('Seo', () => {
       <Seo
         title="Page not found · FlickPick"
         description="This FlickPick page does not exist."
+        noindex
       />,
     )
 
@@ -149,6 +150,10 @@ describe('Seo', () => {
     expect(document.querySelector('meta[name="description"]')).toHaveAttribute(
       'content',
       'This FlickPick page does not exist.',
+    )
+    expect(document.querySelector('meta[name="robots"]')).toHaveAttribute(
+      'content',
+      'noindex',
     )
     expect(
       document.querySelector('meta[property="og:description"]'),
@@ -170,6 +175,40 @@ describe('Seo', () => {
     ).not.toBeInTheDocument()
     expect(
       document.querySelector('link[rel="canonical"]'),
+    ).not.toBeInTheDocument()
+  })
+
+  it('clears robots noindex when leaving an error page', async () => {
+    const { rerender } = render(
+      <Seo
+        title="Page not found · FlickPick"
+        description="This FlickPick page does not exist."
+        noindex
+      />,
+    )
+
+    await waitFor(() => {
+      expect(document.querySelector('meta[name="robots"]')).toHaveAttribute(
+        'content',
+        'noindex',
+      )
+    })
+
+    rerender(
+      <Seo
+        title="FlickPick"
+        description="Browse trending movies."
+        canonical={`${SITE_ORIGIN}/`}
+        ogType="website"
+        shareable
+      />,
+    )
+
+    await waitFor(() => {
+      expect(document.title).toBe('FlickPick')
+    })
+    expect(
+      document.querySelector('meta[name="robots"]'),
     ).not.toBeInTheDocument()
   })
 })

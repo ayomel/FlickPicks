@@ -22,6 +22,7 @@ export const MovieDetailsError = ({
             ? 'No movie matches this id on FlickPick.'
             : 'FlickPick could not load this movie.'
         }
+        noindex
       />
       <h1 className="m-0 text-2xl font-semibold tracking-tight text-foreground">
         {notFound ? 'Movie not found' : 'Something went wrong'}

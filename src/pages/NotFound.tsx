@@ -8,6 +8,7 @@ export const NotFound = () => {
       <Seo
         title="Page not found · FlickPick"
         description="This FlickPick page does not exist."
+        noindex
       />
       <h1 className="m-0 text-2xl font-semibold tracking-tight text-foreground">
         Page not found

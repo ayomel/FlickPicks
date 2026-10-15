@@ -1,7 +1,8 @@
-import { describe, expect, it, vi } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import {
   buildMetaTagsHtml,
   escapeHtml,
+  fetchMovieMeta,
   injectMovieMeta,
   movieCanonicalUrl,
   moviePageTitle,
@@ -90,5 +91,29 @@ describe('movie meta helpers', () => {
     )
 
     vi.unstubAllGlobals()
+  })
+})
+
+describe('fetchMovieMeta', () => {
+  afterEach(() => {
+    vi.unstubAllGlobals()
+  })
+
+  it('returns not_found when the API responds 404', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue(new Response('missing', { status: 404 })),
+    )
+
+    await expect(fetchMovieMeta('999999')).resolves.toBe('not_found')
+  })
+
+  it('returns null when the API responds 5xx', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue(new Response('error', { status: 500 })),
+    )
+
+    await expect(fetchMovieMeta('603')).resolves.toBeNull()
   })
 })

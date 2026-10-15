@@ -45,9 +45,16 @@ export default {
         movieId,
         env.API_ORIGIN ?? DEFAULT_API_ORIGIN,
       )
+      if (movie === 'not_found') {
+        return new Response(shell.body, {
+          status: 404,
+          headers: shell.headers,
+        })
+      }
       if (movie) {
         return injectMovieMeta(shell, movie)
       }
+      // Timeouts and 5xx keep a 200 SPA shell so the client can retry.
       return shell
     }
 
