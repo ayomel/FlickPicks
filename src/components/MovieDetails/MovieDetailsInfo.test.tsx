@@ -49,6 +49,14 @@ describe('MovieDetailsInfo', () => {
     expect(screen.queryByText('$63M')).not.toBeInTheDocument()
   })
 
+  it('loads the sidebar poster eagerly', () => {
+    render(<MovieDetailsInfo movie={movie} />)
+
+    expect(
+      screen.getByRole('img', { name: 'The Matrix poster' }),
+    ).toHaveAttribute('loading', 'eager')
+  })
+
   it('falls back to the Film icon when the poster fails', () => {
     render(<MovieDetailsInfo movie={movie} />)
 

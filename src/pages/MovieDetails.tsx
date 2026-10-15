@@ -50,6 +50,7 @@ export const MovieDetails = () => {
         canonical={absoluteUrl(`/movies/${data.id}`)}
         ogType="video.movie"
         ogImage={movieOgImageUrl(data)}
+        shareable
       />
       <MovieHero movie={data} />
 

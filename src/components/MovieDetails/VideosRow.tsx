@@ -44,7 +44,7 @@ const VideoCard = ({ video, tabIndex, onFocus, onSelect }: VideoCardProps) => {
             src={getYoutubeThumbUrl(video.key)}
             alt=""
             width={480}
-            height={360}
+            height={270}
             loading="lazy"
             decoding="async"
             onError={() => setImageFailed(true)}

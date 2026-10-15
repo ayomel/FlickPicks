@@ -62,7 +62,7 @@ export const MovieDetailsInfo = ({ movie }: MovieDetailsInfoProps) => {
             alt={`${movie.title} poster`}
             width={342}
             height={513}
-            loading="lazy"
+            loading="eager"
             decoding="async"
             onError={() => setPosterFailed(true)}
             className="aspect-[2/3] w-full object-cover"
