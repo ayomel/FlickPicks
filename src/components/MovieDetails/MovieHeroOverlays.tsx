@@ -7,7 +7,7 @@ export const MovieHeroOverlays = () => {
         className="absolute inset-0 opacity-60"
         style={{
           background:
-            'radial-gradient(circle at 15% 85%, color-mix(in srgb, var(--primary) 7%, transparent), transparent 50%)',
+            'radial-gradient(circle at 15% 85%, var(--brand-glow), transparent 50%)',
         }}
       />
     </div>

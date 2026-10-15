@@ -67,10 +67,10 @@ body {
 
 @theme inline {
   --font-sans: 'Inter Variable', 'Inter', ui-sans-serif, system-ui, sans-serif;
-  --font-heading: 'Inter Tight', 'Inter Variable', ui-sans-serif, system-ui,
-    sans-serif;
-  --font-mono: ui-monospace, 'SFMono-Regular', Menlo, Monaco, Consolas,
-    monospace;
+  --font-heading:
+    'Inter Tight', 'Inter Variable', ui-sans-serif, system-ui, sans-serif;
+  --font-mono:
+    ui-monospace, 'SFMono-Regular', Menlo, Monaco, Consolas, monospace;
 
   --color-brand: var(--brand-text);
   --color-brand-hover: var(--brand-hover);
