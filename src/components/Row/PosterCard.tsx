@@ -1,3 +1,4 @@
+import { useState, type FocusEventHandler } from 'react'
 import { Film } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { cn } from '@/lib/utils'
@@ -13,14 +14,31 @@ export type PosterCardMovie = {
 
 type PosterCardProps = {
   movie: PosterCardMovie
+  tabIndex?: number
+  onFocus?: FocusEventHandler<HTMLAnchorElement>
+  /** Prefer eager for the first visible cards in an above-the-fold row. */
+  eager?: boolean
 }
 
-export const PosterCard = ({ movie }: PosterCardProps) => {
+const POSTER_WIDTH = 342
+const POSTER_HEIGHT = 513
+
+export const PosterCard = ({
+  movie,
+  tabIndex,
+  onFocus,
+  eager = false,
+}: PosterCardProps) => {
+  const [imageFailed, setImageFailed] = useState(false)
   const year = movie.release_date ? formatReleaseYear(movie.release_date) : null
+  const posterPath = movie.poster_path
+  const showImage = Boolean(posterPath) && !imageFailed
 
   return (
     <Link
       to={`/movies/${movie.id}`}
+      tabIndex={tabIndex}
+      onFocus={onFocus}
       className={cn(
         'group/card block w-36 shrink-0 snap-start sm:w-40',
         'outline-none focus-visible:ring-2 focus-visible:ring-foreground/70 focus-visible:ring-offset-2 focus-visible:ring-offset-background',
@@ -32,10 +50,15 @@ export const PosterCard = ({ movie }: PosterCardProps) => {
           'transition-[border-color] duration-200 group-hover/card:border-brand/35',
         )}
       >
-        {movie.poster_path ? (
+        {showImage && posterPath ? (
           <img
-            src={getPosterCardPath(movie.poster_path)}
+            src={getPosterCardPath(posterPath)}
             alt=""
+            width={POSTER_WIDTH}
+            height={POSTER_HEIGHT}
+            loading={eager ? 'eager' : 'lazy'}
+            decoding="async"
+            onError={() => setImageFailed(true)}
             className={cn(
               'size-full object-cover transition-transform duration-200',
               '[@media(hover:hover)]:group-hover/card:scale-105',

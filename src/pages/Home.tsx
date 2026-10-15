@@ -1,4 +1,5 @@
 import FeatureMovieHero from '../components/FeatureMovieHero/FeatureMovieHero'
+import { ComingSoonRow } from '@/components/Row/ComingSoonRow'
 import { TrendingRows } from '@/components/Row/TrendingRows'
 import { WatchlistRow } from '@/components/Watchlist/WatchlistRow'
 
@@ -8,6 +9,7 @@ export const Home = () => {
       <FeatureMovieHero />
       <div className="relative z-10 pb-16">
         <TrendingRows />
+        <ComingSoonRow />
         <WatchlistRow />
       </div>
     </div>
