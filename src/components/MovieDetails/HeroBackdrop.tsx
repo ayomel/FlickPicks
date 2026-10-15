@@ -38,7 +38,7 @@ export const HeroBackdrop = ({
       decoding="async"
       fetchPriority="high"
       onError={() => setImageFailed(true)}
-      className="absolute inset-0 size-full object-cover opacity-90"
+      className="absolute inset-0 size-full object-cover"
     />
   )
 }

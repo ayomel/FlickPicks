@@ -10,16 +10,33 @@ type MovieHeroProps = {
   movie: MovieDetails
 }
 
+const heroMinHeight = 'min-h-[min(80svh,760px)]'
+
 export const MovieHero = ({ movie }: MovieHeroProps) => {
   const backdropPath = movie.backdrop_path
   const absoluteUrl =
     !backdropPath && movie.backdrop?.startsWith('http') ? movie.backdrop : null
 
   return (
-    <section className="relative min-h-[420px] min-h-[55svh] w-full overflow-hidden bg-background sm:min-h-[520px] sm:min-h-[65svh]">
+    <section
+      className={cn(
+        'relative w-full overflow-hidden bg-background',
+        heroMinHeight,
+      )}
+    >
       <HeroBackdrop backdropPath={backdropPath} absoluteUrl={absoluteUrl} />
       <MovieHeroOverlays />
-      <div className="relative z-10 flex min-h-[420px] min-h-[55svh] flex-col justify-between px-6 pb-10 pt-20 sm:min-h-[520px] sm:min-h-[65svh] sm:px-8 sm:pt-24 lg:px-10">
+      {/* Solid bottom edge so the hero meets page background without a seam */}
+      <div
+        className="pointer-events-none absolute inset-x-0 bottom-0 z-[1] h-16 bg-linear-to-t from-background to-transparent"
+        aria-hidden
+      />
+      <div
+        className={cn(
+          'relative z-10 flex flex-col justify-between px-6 pb-10 pt-20 sm:px-8 sm:pt-24 lg:px-10',
+          heroMinHeight,
+        )}
+      >
         <div className="mx-auto w-full max-w-6xl">
           <Link
             to="/"

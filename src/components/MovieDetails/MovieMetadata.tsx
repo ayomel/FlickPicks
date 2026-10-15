@@ -23,7 +23,7 @@ export const MovieMetadata = ({ movie }: MovieMetadataProps) => {
         {movie.title}
       </h1>
       {movie.tagline ? (
-        <p className="m-0 font-sans text-lg font-medium italic text-muted-foreground sm:text-xl">
+        <p className="m-0 font-sans text-lg font-medium text-foreground/95 italic drop-shadow-[0_1px_2px_rgba(0,0,0,0.65)] sm:text-xl">
           {movie.tagline}
         </p>
       ) : null}
