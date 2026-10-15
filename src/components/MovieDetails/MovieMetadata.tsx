@@ -43,7 +43,11 @@ export const MovieMetadata = ({ movie }: MovieMetadataProps) => {
       {movie.genres.length > 0 ? (
         <div className="flex flex-wrap gap-2">
           {movie.genres.map((genre) => (
-            <Badge key={genre.id} variant="secondary" className="border border-border">
+            <Badge
+              key={genre.id}
+              variant="secondary"
+              className="border border-border"
+            >
               {genre.name}
             </Badge>
           ))}

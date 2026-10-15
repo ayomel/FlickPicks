@@ -26,6 +26,5 @@ export type TrendingResponse = {
 
 export type FeaturedMovie = TrendingMovie & { backdrop_path: string }
 
-export const hasBackdrop = (
-  movie: TrendingMovie,
-): movie is FeaturedMovie => Boolean(movie.backdrop_path)
+export const hasBackdrop = (movie: TrendingMovie): movie is FeaturedMovie =>
+  Boolean(movie.backdrop_path)

@@ -6,7 +6,8 @@ import { watchlistQueryKey } from '@/hooks/useWatchlistQuery'
 const getWatchlistEntries = async (
   queryClient: ReturnType<typeof useQueryClient>,
 ) => {
-  const cached = queryClient.getQueryData<WatchlistEntryRead[]>(watchlistQueryKey)
+  const cached =
+    queryClient.getQueryData<WatchlistEntryRead[]>(watchlistQueryKey)
   if (cached) return cached
   const { data } = await apiClient.get<WatchlistEntryRead[]>('/entry')
   return data
