@@ -104,7 +104,7 @@ const renderHero = () => {
   )
 }
 
-/** Native dispatch so leave→enter can share one React batch (RTL fireEvent flushes). */
+/** Native dispatch so leave then enter can share one React batch (React Testing Library fireEvent flushes). */
 const mouseOver = (
   target: Element,
   relatedTarget: EventTarget | null = null,

@@ -1,6 +1,6 @@
 export const MovieHeroOverlays = () => {
   // lg+: solid through contentLeft + max-w-2xl, then soft fade.
-  // contentLeft ≈ max(2.5rem, (100vw - 72rem) / 2) for the padded max-w-6xl column.
+  // contentLeft is max(2.5rem, (100vw - 72rem) / 2) for the padded max-w-6xl column.
   const lgColumnStop = 'max(46rem, calc((100vw - 72rem) / 2 + 43.5rem))'
 
   return (

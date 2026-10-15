@@ -41,7 +41,7 @@ export const MovieHero = ({ movie }: MovieHeroProps) => {
           <Link
             to="/"
             className={cn(
-              'inline-flex items-center gap-2 rounded-md text-sm font-medium text-foreground/90',
+              'inline-flex items-center gap-2 rounded-full bg-background/70 px-3 py-1 text-sm font-medium text-foreground/90 backdrop-blur-sm',
               'outline-none transition-colors hover:text-foreground',
               'focus-visible:ring-2 focus-visible:ring-foreground/70 focus-visible:ring-offset-2 focus-visible:ring-offset-background',
             )}
@@ -50,8 +50,16 @@ export const MovieHero = ({ movie }: MovieHeroProps) => {
             Back to browse
           </Link>
         </div>
-        <div className="mx-auto w-full max-w-6xl">
-          <MovieMetadata movie={movie} />
+        <div
+          className={cn(
+            'relative mx-auto w-full max-w-6xl',
+            "before:pointer-events-none before:absolute before:inset-0 before:content-[''] before:bg-linear-to-b before:from-transparent before:via-background/85 before:via-25% before:to-background",
+            'lg:before:hidden',
+          )}
+        >
+          <div className="relative max-lg:pt-20">
+            <MovieMetadata movie={movie} />
+          </div>
         </div>
       </div>
     </section>
