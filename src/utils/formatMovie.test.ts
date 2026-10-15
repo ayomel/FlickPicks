@@ -131,4 +131,39 @@ describe('youtube helpers', () => {
       'clip-new',
     ])
   })
+
+  it('sorts safely when published_at is missing', () => {
+    const movie = {
+      videos: {
+        results: [
+          {
+            id: 'a',
+            key: 'a',
+            name: 'A',
+            site: 'YouTube',
+            type: 'Clip',
+            official: false,
+            iso_639_1: 'en',
+            iso_3166_1: 'US',
+            size: 720,
+            published_at: undefined as unknown as string,
+          },
+          {
+            id: 'b',
+            key: 'b',
+            name: 'B',
+            site: 'YouTube',
+            type: 'Clip',
+            official: false,
+            iso_639_1: 'en',
+            iso_3166_1: 'US',
+            size: 720,
+            published_at: '2024-01-01',
+          },
+        ],
+      },
+    } as MovieDetails
+
+    expect(getYoutubeVideos(movie).map((item) => item.id)).toEqual(['b', 'a'])
+  })
 })

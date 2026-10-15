@@ -10,6 +10,7 @@ import { MovieDetailsError } from '@/components/MovieDetails/MovieDetailsError'
 import { TrailerPlayer } from '@/components/MovieDetails/TrailerPlayer'
 import { AddToWatchlistButton } from '@/components/MovieDetails/AddToWatchlistButton'
 import { VideosRow } from '@/components/MovieDetails/VideosRow'
+import { MoreTrendingRow } from '@/components/MovieDetails/MoreTrendingRow'
 import { isNumericMovieId } from '@/utils/isNumericMovieId'
 
 export const MovieDetails = () => {
@@ -56,6 +57,7 @@ export const MovieDetails = () => {
 
       <VideosRow movie={data} />
       <WatchProviders providers={data.streaming_providers} />
+      <MoreTrendingRow excludeId={data.id} />
     </div>
   )
 }

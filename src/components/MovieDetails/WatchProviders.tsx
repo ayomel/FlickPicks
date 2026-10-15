@@ -1,6 +1,7 @@
 import { PageSection } from '@/components/ui/page-section'
 import type { StreamingProviders, WatchProvider } from '@/types/movieDetails'
 import { getProviderLogoUrl } from '@/utils/formatMovie'
+import { cn } from '@/lib/utils'
 
 type WatchProvidersProps = {
   providers?: StreamingProviders
@@ -40,6 +41,36 @@ const ProviderGroup = ({
   )
 }
 
+const Attribution = ({
+  link,
+  className,
+}: {
+  link?: string
+  className?: string
+}) => {
+  return (
+    <p className={cn('m-0 font-mono text-xs text-muted-foreground', className)}>
+      US availability via TMDB
+      {link ? (
+        <>
+          {' · '}
+          <a
+            href={link}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline-offset-2 hover:text-foreground hover:underline"
+          >
+            JustWatch
+          </a>
+        </>
+      ) : (
+        ' / JustWatch'
+      )}
+      .
+    </p>
+  )
+}
+
 export const WatchProviders = ({ providers }: WatchProvidersProps) => {
   const stream = providers?.flatrate ?? []
   const rent = providers?.rent ?? []
@@ -52,9 +83,12 @@ export const WatchProviders = ({ providers }: WatchProvidersProps) => {
         <h2 className="mb-3 font-mono text-xs font-semibold tracking-[0.08em] text-brand uppercase">
           Where to watch
         </h2>
-        <p className="m-0 text-sm text-muted-foreground">
-          Streaming availability is currently unavailable.
-        </p>
+        <div className="rounded-lg border border-border bg-card px-4 py-5">
+          <p className="m-0 text-sm text-foreground">
+            No streaming options listed yet.
+          </p>
+          <Attribution link={providers?.link} className="mt-3" />
+        </div>
       </PageSection>
     )
   }
@@ -69,6 +103,7 @@ export const WatchProviders = ({ providers }: WatchProvidersProps) => {
         <ProviderGroup label="Rent" items={rent} />
         <ProviderGroup label="Buy" items={buy} />
       </div>
+      <Attribution link={providers?.link} className="mt-6" />
     </PageSection>
   )
 }

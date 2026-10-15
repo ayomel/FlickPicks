@@ -7,10 +7,11 @@ afterEach(() => {
 })
 
 describe('WatchProviders', () => {
-  it('uses Where to watch as h2 and Stream/Rent/Buy as h3', () => {
+  it('uses Where to watch as h2 and Stream/Rent/Buy as h3 with JustWatch attribution', () => {
     render(
       <WatchProviders
         providers={{
+          link: 'https://www.themoviedb.org/movie/603/watch?locale=US',
           flatrate: [
             {
               provider_id: 1,
@@ -51,5 +52,23 @@ describe('WatchProviders', () => {
     expect(
       screen.getByRole('heading', { level: 3, name: 'Buy' }),
     ).toBeInTheDocument()
+    expect(
+      screen.getByRole('link', { name: 'JustWatch' }),
+    ).toHaveAttribute(
+      'href',
+      'https://www.themoviedb.org/movie/603/watch?locale=US',
+    )
+  })
+
+  it('shows an empty-state card when no US providers are listed', () => {
+    render(<WatchProviders providers={{ flatrate: [], rent: [], buy: [] }} />)
+
+    expect(
+      screen.getByRole('heading', { level: 2, name: 'Where to watch' }),
+    ).toBeInTheDocument()
+    expect(
+      screen.getByText('No streaming options listed yet.'),
+    ).toBeInTheDocument()
+    expect(screen.getByText(/TMDB \/ JustWatch/)).toBeInTheDocument()
   })
 })
