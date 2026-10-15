@@ -17,20 +17,20 @@ const usePrefersReducedMotion = () => {
   return reduced
 }
 
+const wrapIndex = (value: number, length: number) =>
+  length === 0 ? 0 : ((value % length) + length) % length
+
 export const useHeroSlideshow = (length: number) => {
-  const [index, setIndex] = useState(0)
+  const [rawIndex, setRawIndex] = useState(0)
   const [paused, setPaused] = useState(false)
   const reducedMotion = usePrefersReducedMotion()
-
-  useEffect(() => {
-    setIndex((current) => (length === 0 ? 0 : current % length))
-  }, [length])
+  const index = wrapIndex(rawIndex, length)
 
   useEffect(() => {
     if (length <= 1 || paused || reducedMotion) return
 
     const timer = window.setInterval(() => {
-      setIndex((current) => (current + 1) % length)
+      setRawIndex((current) => current + 1)
     }, INTERVAL_MS)
 
     return () => window.clearInterval(timer)
@@ -38,17 +38,17 @@ export const useHeroSlideshow = (length: number) => {
 
   const goTo = (nextIndex: number) => {
     if (length === 0) return
-    setIndex(nextIndex)
+    setRawIndex(nextIndex)
   }
 
   const next = () => {
     if (length === 0) return
-    setIndex((current) => (current + 1) % length)
+    setRawIndex((current) => current + 1)
   }
 
   const prev = () => {
     if (length === 0) return
-    setIndex((current) => (current - 1 + length) % length)
+    setRawIndex((current) => current - 1)
   }
 
   return { index, next, prev, goTo, setPaused, reducedMotion }

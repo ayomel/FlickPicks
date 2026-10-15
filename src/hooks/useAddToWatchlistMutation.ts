@@ -1,6 +1,9 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { apiClient } from '../../services/apiClient'
-import type { WatchlistEntryCreate, WatchlistEntryRead } from '@/types/watchlist'
+import type {
+  WatchlistEntryCreate,
+  WatchlistEntryRead,
+} from '@/types/watchlist'
 import { watchlistQueryKey } from '@/hooks/useWatchlistQuery'
 
 export const useAddToWatchlistMutation = () => {

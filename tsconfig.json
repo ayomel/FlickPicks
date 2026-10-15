@@ -12,15 +12,9 @@
     "baseUrl": ".",
     "ignoreDeprecations": "6.0",
     "paths": {
-      "@/*": [
-        "./src/*"
-      ],
-      "@components/*": [
-        "./src/components/*"
-      ],
-      "@hooks/*": [
-        "./src/hooks/*"
-      ]
+      "@/*": ["./src/*"],
+      "@components/*": ["./src/components/*"],
+      "@hooks/*": ["./src/hooks/*"]
     }
   }
 }

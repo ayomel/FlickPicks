@@ -51,9 +51,7 @@ export const AddToWatchlistButton = ({
       onPress={handlePress}
       aria-live="polite"
       aria-pressed={isOnWatchlist}
-      aria-label={
-        isOnWatchlist ? 'Remove from watchlist' : 'Add to watchlist'
-      }
+      aria-label={isOnWatchlist ? 'Remove from watchlist' : 'Add to watchlist'}
       className={cn(
         isOnWatchlist &&
           'border-brand/30 bg-brand-soft text-brand hover:border-border hover:bg-muted hover:text-foreground',

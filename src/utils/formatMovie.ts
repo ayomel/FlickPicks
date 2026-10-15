@@ -88,9 +88,7 @@ export const getPrimaryLanguage = (movie: MovieDetails) => {
 }
 
 export const getStudioNames = (movie: MovieDetails) => {
-  const names = movie.production_companies
-    ?.map((c) => c.name)
-    .filter(Boolean)
+  const names = movie.production_companies?.map((c) => c.name).filter(Boolean)
   if (!names?.length) return null
   return names.join(', ')
 }
