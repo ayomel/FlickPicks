@@ -17,8 +17,7 @@ export const AppHeader = () => {
           className={cn(
             'inline-flex shrink-0 rounded-sm outline-none',
             'transition-opacity hover:opacity-90',
-            // Keep the focus ring inside the padded header so it is not clipped
-            // by backdrop-filter at narrow widths (e.g. 390px).
+            // Avoid ring-offset so the brand focus ring stays inside the header at 390px.
             'focus-visible:ring-2 focus-visible:ring-brand/40',
           )}
         >
