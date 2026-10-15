@@ -79,10 +79,21 @@ export const getYoutubeThumbUrl = (videoId: string) => {
   return `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`
 }
 
+const youtubeVideoGroup = (video: { type: string; official: boolean }) => {
+  if (video.type === 'Trailer' && video.official) return 0
+  if (video.type === 'Teaser') return 1
+  return 2
+}
+
 export const getYoutubeVideos = (movie: MovieDetails) => {
-  return (movie.videos?.results ?? []).filter(
-    (video) => video.site === 'YouTube' && Boolean(video.key),
-  )
+  return (movie.videos?.results ?? [])
+    .filter((video) => video.site === 'YouTube' && Boolean(video.key))
+    .slice()
+    .sort((a, b) => {
+      const groupDiff = youtubeVideoGroup(a) - youtubeVideoGroup(b)
+      if (groupDiff !== 0) return groupDiff
+      return b.published_at.localeCompare(a.published_at)
+    })
 }
 
 export const resolveBackdropUrl = (movie: MovieDetails) => {

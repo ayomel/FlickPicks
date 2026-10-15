@@ -29,6 +29,12 @@ describe('TrailerPlayer', () => {
       'src',
       'https://www.youtube-nocookie.com/embed/vKQi3bBA1y8?autoplay=1&rel=0',
     )
+    expect(iframe).toHaveAttribute(
+      'referrerPolicy',
+      'strict-origin-when-cross-origin',
+    )
+    expect(screen.getByText('Esc or Close')).toBeInTheDocument()
+    expect(screen.getByRole('dialog')).toHaveAttribute('aria-modal', 'true')
   })
 
   it('closes on Escape', async () => {

@@ -4,8 +4,9 @@ import {
   getCountryNames,
   getYoutubeEmbedUrl,
   getYoutubeThumbUrl,
+  getYoutubeVideos,
 } from './formatMovie'
-import type { MovieDetails } from '@/types/movieDetails'
+import type { MovieDetails, MovieVideo } from '@/types/movieDetails'
 
 const baseMovie = {
   production_countries: [
@@ -45,5 +46,89 @@ describe('youtube helpers', () => {
     expect(getYoutubeThumbUrl('abc')).toBe(
       'https://i.ytimg.com/vi/abc/hqdefault.jpg',
     )
+  })
+
+  it('keeps every YouTube video and sorts official trailers, teasers, then the rest', () => {
+    const video = (
+      partial: Partial<MovieVideo> & Pick<MovieVideo, 'id' | 'key' | 'name'>,
+    ): MovieVideo => ({
+      iso_639_1: 'en',
+      iso_3166_1: 'US',
+      site: 'YouTube',
+      size: 1080,
+      type: 'Clip',
+      official: false,
+      published_at: '2020-01-01',
+      ...partial,
+    })
+
+    const movie = {
+      videos: {
+        results: [
+          video({
+            id: 'clip-new',
+            key: 'clip-new',
+            name: 'Featurette',
+            type: 'Featurette',
+            published_at: '2024-06-01',
+          }),
+          video({
+            id: 'teaser-old',
+            key: 'teaser-old',
+            name: 'Teaser A',
+            type: 'Teaser',
+            published_at: '2023-01-01',
+          }),
+          video({
+            id: 'trailer-new',
+            key: 'trailer-new',
+            name: 'Official Trailer B',
+            type: 'Trailer',
+            official: true,
+            published_at: '2024-02-01',
+          }),
+          video({
+            id: 'trailer-old',
+            key: 'trailer-old',
+            name: 'Official Trailer A',
+            type: 'Trailer',
+            official: true,
+            published_at: '2023-02-01',
+          }),
+          video({
+            id: 'teaser-new',
+            key: 'teaser-new',
+            name: 'Teaser B',
+            type: 'Teaser',
+            published_at: '2024-01-01',
+          }),
+          video({
+            id: 'unofficial-trailer',
+            key: 'unofficial-trailer',
+            name: 'Fan Trailer',
+            type: 'Trailer',
+            official: false,
+            published_at: '2025-01-01',
+          }),
+          {
+            ...video({
+              id: 'vimeo',
+              key: 'vimeo',
+              name: 'Vimeo Clip',
+            }),
+            site: 'Vimeo',
+          },
+        ],
+      },
+    } as MovieDetails
+
+    expect(getYoutubeVideos(movie).map((item) => item.id)).toEqual([
+      'trailer-new',
+      'trailer-old',
+      'teaser-new',
+      'teaser-old',
+      'unofficial-trailer',
+      'clip-new',
+    ])
   })
 })

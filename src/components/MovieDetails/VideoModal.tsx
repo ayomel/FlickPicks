@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { X } from 'lucide-react'
 import { Dialog, Heading, Modal, ModalOverlay } from 'react-aria-components'
 import { Button } from '@/components/ui/button'
@@ -18,6 +18,8 @@ export const VideoModal = ({
   isOpen,
   onOpenChange,
 }: VideoModalProps) => {
+  const dialogRef = useRef<HTMLElement | null>(null)
+
   useEffect(() => {
     if (!isOpen) return
     const previousOverflow = document.body.style.overflow
@@ -25,6 +27,11 @@ export const VideoModal = ({
     return () => {
       document.body.style.overflow = previousOverflow
     }
+  }, [isOpen])
+
+  useEffect(() => {
+    if (!isOpen) return
+    dialogRef.current?.setAttribute('aria-modal', 'true')
   }, [isOpen])
 
   return (
@@ -45,16 +52,28 @@ export const VideoModal = ({
           'exiting:animate-out exiting:zoom-out-95 exiting:duration-100',
         )}
       >
-        <Dialog aria-label={title} className="outline-none">
+        <Dialog
+          aria-label={title}
+          className="outline-none"
+          ref={(node) => {
+            dialogRef.current = node
+            if (node) node.setAttribute('aria-modal', 'true')
+          }}
+        >
           {({ close }) => (
             <div className="overflow-hidden rounded-lg border border-border bg-card shadow-lg">
               <div className="flex items-center justify-between gap-3 border-b border-border px-4 py-3">
-                <Heading
-                  slot="title"
-                  className="m-0 truncate text-sm font-semibold text-foreground"
-                >
-                  {title}
-                </Heading>
+                <div className="min-w-0">
+                  <Heading
+                    slot="title"
+                    className="m-0 truncate text-sm font-semibold text-foreground"
+                  >
+                    {title}
+                  </Heading>
+                  <p className="m-0 mt-0.5 font-mono text-xs text-muted-foreground">
+                    Esc or Close
+                  </p>
+                </div>
                 <Button
                   size="icon"
                   variant="ghost"
@@ -69,6 +88,7 @@ export const VideoModal = ({
                   <iframe
                     title={title}
                     src={getYoutubeEmbedUrl(videoId)}
+                    referrerPolicy="strict-origin-when-cross-origin"
                     className="size-full border-0"
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                     allowFullScreen

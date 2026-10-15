@@ -1,4 +1,4 @@
-import { cleanup, render, screen } from '@testing-library/react'
+import { cleanup, fireEvent, render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, describe, expect, it } from 'vitest'
 import { VideosRow } from './VideosRow'
@@ -42,7 +42,7 @@ const movie = {
 } as MovieDetails
 
 describe('VideosRow', () => {
-  it('renders YouTube thumbs and opens the selected clip', async () => {
+  it('renders YouTube thumbnails and opens the selected clip', async () => {
     const user = userEvent.setup()
     render(<VideosRow movie={movie} />)
 
@@ -50,16 +50,34 @@ describe('VideosRow', () => {
       screen.getByRole('heading', { name: 'Trailers & clips' }),
     ).toBeInTheDocument()
     expect(
-      screen.getByRole('button', { name: /official trailer/i }),
+      screen.getByRole('button', {
+        name: 'Play Official Trailer, Trailer, Official',
+      }),
     ).toBeInTheDocument()
     expect(screen.queryByText('Other')).not.toBeInTheDocument()
 
-    await user.click(screen.getByRole('button', { name: /official trailer/i }))
+    await user.click(
+      screen.getByRole('button', {
+        name: 'Play Official Trailer, Trailer, Official',
+      }),
+    )
 
     const iframe = await screen.findByTitle('Official Trailer')
     expect(iframe).toHaveAttribute(
       'src',
       'https://www.youtube-nocookie.com/embed/abc123?autoplay=1&rel=0',
     )
+    expect(iframe).toHaveAttribute(
+      'referrerPolicy',
+      'strict-origin-when-cross-origin',
+    )
+  })
+
+  it('falls back to an icon when a thumbnail fails', () => {
+    render(<VideosRow movie={movie} />)
+
+    fireEvent.error(screen.getByRole('presentation'))
+    expect(screen.queryByRole('presentation')).not.toBeInTheDocument()
+    expect(document.querySelector('svg')).toBeTruthy()
   })
 })

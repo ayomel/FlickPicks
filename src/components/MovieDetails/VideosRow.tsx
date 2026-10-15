@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Play } from 'lucide-react'
+import { Film, Play } from 'lucide-react'
 import { MediaRow, type MediaRowItemOptions } from '@/components/Row/MediaRow'
 import type { MovieDetails, MovieVideo } from '@/types/movieDetails'
 import { getYoutubeThumbUrl, getYoutubeVideos } from '@/utils/formatMovie'
@@ -17,31 +17,47 @@ type VideoCardProps = {
   onSelect: (video: MovieVideo) => void
 }
 
+const videoActionLabel = (video: MovieVideo) => {
+  const parts = [`Play ${video.name}`, video.type]
+  if (video.official) parts.push('Official')
+  return parts.join(', ')
+}
+
 const VideoCard = ({ video, tabIndex, onFocus, onSelect }: VideoCardProps) => {
+  const [imageFailed, setImageFailed] = useState(false)
+
   return (
     <button
       type="button"
       tabIndex={tabIndex}
       onFocus={onFocus}
       onClick={() => onSelect(video)}
+      aria-label={videoActionLabel(video)}
       className={cn(
         'group/card relative block w-64 shrink-0 snap-start overflow-hidden rounded-md border border-border bg-card text-left sm:w-80',
         'outline-none focus-visible:ring-2 focus-visible:ring-foreground/70 focus-visible:ring-offset-2 focus-visible:ring-offset-background',
       )}
     >
-      <div className="aspect-video overflow-hidden bg-muted">
-        <img
-          src={getYoutubeThumbUrl(video.key)}
-          alt=""
-          width={480}
-          height={360}
-          loading="lazy"
-          decoding="async"
-          className={cn(
-            'size-full object-cover transition-transform duration-200',
-            '[@media(hover:hover)]:group-hover/card:scale-105',
-          )}
-        />
+      <div className="relative aspect-video overflow-hidden bg-muted">
+        {imageFailed ? (
+          <div className="flex size-full items-center justify-center bg-muted">
+            <Film className="size-8 text-muted-foreground" aria-hidden />
+          </div>
+        ) : (
+          <img
+            src={getYoutubeThumbUrl(video.key)}
+            alt=""
+            width={480}
+            height={360}
+            loading="lazy"
+            decoding="async"
+            onError={() => setImageFailed(true)}
+            className={cn(
+              'size-full object-cover transition-transform duration-200',
+              '[@media(hover:hover)]:group-hover/card:scale-105',
+            )}
+          />
+        )}
         <span className="pointer-events-none absolute inset-0 flex items-center justify-center bg-background/25">
           <span className="flex size-12 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-md">
             <Play className="size-5 fill-current" aria-hidden />
