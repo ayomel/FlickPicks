@@ -1,10 +1,52 @@
+import { useState } from 'react'
 import { PageSection } from '@/components/ui/page-section'
 import type { StreamingProviders, WatchProvider } from '@/types/movieDetails'
 import { getProviderLogoUrl } from '@/utils/formatMovie'
+import { providerInitials, uniqueProviders } from '@/utils/watchProviders'
 import { cn } from '@/lib/utils'
 
 type WatchProvidersProps = {
   providers?: StreamingProviders
+}
+
+const PROVIDER_LOGO_SIZE = 92
+
+const ProviderTile = ({
+  provider,
+  failed,
+  onImageError,
+}: {
+  provider: WatchProvider
+  failed: boolean
+  onImageError: () => void
+}) => {
+  return (
+    <div
+      className="flex size-11 items-center justify-center overflow-hidden rounded-md border border-border bg-card p-1.5 transition-colors hover:bg-muted"
+      title={provider.provider_name}
+    >
+      {failed ? (
+        <span
+          role="img"
+          aria-label={provider.provider_name}
+          className="font-mono text-[0.65rem] font-semibold tracking-wide text-muted-foreground uppercase"
+        >
+          {providerInitials(provider.provider_name)}
+        </span>
+      ) : (
+        <img
+          src={getProviderLogoUrl(provider.logo_path)}
+          alt={provider.provider_name}
+          width={PROVIDER_LOGO_SIZE}
+          height={PROVIDER_LOGO_SIZE}
+          loading="lazy"
+          decoding="async"
+          onError={onImageError}
+          className="max-h-full max-w-full object-contain"
+        />
+      )}
+    </div>
+  )
 }
 
 const ProviderGroup = ({
@@ -14,7 +56,10 @@ const ProviderGroup = ({
   label: string
   items: WatchProvider[]
 }) => {
-  if (!items.length) return null
+  const providers = uniqueProviders(items)
+  const [failedIds, setFailedIds] = useState(() => new Set<number>())
+
+  if (!providers.length) return null
 
   return (
     <div className="flex flex-col gap-3">
@@ -22,18 +67,20 @@ const ProviderGroup = ({
         {label}
       </h3>
       <ul className="m-0 flex list-none flex-wrap gap-2 p-0">
-        {items.map((provider) => (
+        {providers.map((provider) => (
           <li key={`${label}-${provider.provider_id}`}>
-            <div
-              className="flex size-11 items-center justify-center overflow-hidden rounded-md border border-border bg-card p-1.5 transition-colors hover:bg-muted"
-              title={provider.provider_name}
-            >
-              <img
-                src={getProviderLogoUrl(provider.logo_path)}
-                alt={provider.provider_name}
-                className="max-h-full max-w-full object-contain"
-              />
-            </div>
+            <ProviderTile
+              provider={provider}
+              failed={failedIds.has(provider.provider_id)}
+              onImageError={() => {
+                setFailedIds((prev) => {
+                  if (prev.has(provider.provider_id)) return prev
+                  const next = new Set(prev)
+                  next.add(provider.provider_id)
+                  return next
+                })
+              }}
+            />
           </li>
         ))}
       </ul>
@@ -50,21 +97,19 @@ const Attribution = ({
 }) => {
   return (
     <p className={cn('m-0 font-mono text-xs text-muted-foreground', className)}>
-      US availability via TMDB
+      US availability via JustWatch
+      {' · '}
       {link ? (
-        <>
-          {' · '}
-          <a
-            href={link}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="underline-offset-2 hover:text-foreground hover:underline"
-          >
-            JustWatch
-          </a>
-        </>
+        <a
+          href={link}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="underline-offset-2 hover:text-foreground hover:underline"
+        >
+          TMDB
+        </a>
       ) : (
-        ' / JustWatch'
+        'TMDB'
       )}
       .
     </p>
@@ -75,7 +120,10 @@ export const WatchProviders = ({ providers }: WatchProvidersProps) => {
   const stream = providers?.flatrate ?? []
   const rent = providers?.rent ?? []
   const buy = providers?.buy ?? []
-  const hasAny = stream.length > 0 || rent.length > 0 || buy.length > 0
+  const hasAny =
+    uniqueProviders(stream).length > 0 ||
+    uniqueProviders(rent).length > 0 ||
+    uniqueProviders(buy).length > 0
 
   if (!hasAny) {
     return (
