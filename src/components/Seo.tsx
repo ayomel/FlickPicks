@@ -26,6 +26,12 @@ const upsertMeta = (
   existing.slice(1).forEach((node) => node.remove())
 }
 
+const removeMeta = (attr: 'name' | 'property', key: string) => {
+  document.head
+    .querySelectorAll(`meta[${attr}="${key}"]`)
+    .forEach((node) => node.remove())
+}
+
 const upsertCanonical = (href: string) => {
   const existing = [
     ...document.head.querySelectorAll<HTMLLinkElement>('link[rel="canonical"]'),
@@ -39,6 +45,12 @@ const upsertCanonical = (href: string) => {
   existing.slice(1).forEach((node) => node.remove())
 }
 
+const removeCanonical = () => {
+  document.head
+    .querySelectorAll('link[rel="canonical"]')
+    .forEach((node) => node.remove())
+}
+
 export const Seo = ({
   title,
   description,
@@ -47,15 +59,33 @@ export const Seo = ({
   ogImage,
 }: SeoProps) => {
   useLayoutEffect(() => {
-    if (description) upsertMeta('name', 'description', description)
-    if (ogType) upsertMeta('property', 'og:type', ogType)
+    document.title = title
+
+    if (description) {
+      upsertMeta('name', 'description', description)
+      upsertMeta('property', 'og:description', description)
+    } else {
+      removeMeta('name', 'description')
+      removeMeta('property', 'og:description')
+    }
+
     upsertMeta('property', 'og:title', title)
-    if (description) upsertMeta('property', 'og:description', description)
-    if (ogImage) upsertMeta('property', 'og:image', ogImage)
-    if (canonical) upsertMeta('property', 'og:url', canonical)
     upsertMeta('name', 'twitter:card', 'summary_large_image')
-    if (canonical) upsertCanonical(canonical)
+
+    if (ogType) upsertMeta('property', 'og:type', ogType)
+    else removeMeta('property', 'og:type')
+
+    if (ogImage) upsertMeta('property', 'og:image', ogImage)
+    else removeMeta('property', 'og:image')
+
+    if (canonical) {
+      upsertMeta('property', 'og:url', canonical)
+      upsertCanonical(canonical)
+    } else {
+      removeMeta('property', 'og:url')
+      removeCanonical()
+    }
   }, [title, description, canonical, ogType, ogImage])
 
-  return <title>{title}</title>
+  return null
 }

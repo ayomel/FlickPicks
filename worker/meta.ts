@@ -107,7 +107,7 @@ export const injectMovieMeta = async (
     })
     .on('meta[name="description"]', {
       element(element) {
-        element.setAttribute('content', escapeHtml(description))
+        element.setAttribute('content', description)
       },
     })
     .on('head', {

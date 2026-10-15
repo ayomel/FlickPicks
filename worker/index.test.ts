@@ -48,7 +48,8 @@ class FakeHTMLRewriter {
         let content = ''
         this.descriptionHandler.element({
           setAttribute(name: string, value: string) {
-            if (name === 'content') content = value
+            // Match HTMLRewriter: callers pass raw text; serialization escapes.
+            if (name === 'content') content = escapeHtml(value)
           },
         })
         html = html.replace(

@@ -1,3 +1,6 @@
+/** Same production origin the Worker uses for canonical and og:url. */
+export const SITE_ORIGIN = 'https://flickpick.mel-2cb.workers.dev'
+
 export const movieOgImageUrl = (movie: {
   backdrop_path?: string | null
   poster_path?: string | null
@@ -8,9 +11,6 @@ export const movieOgImageUrl = (movie: {
 }
 
 export const absoluteUrl = (pathname: string) => {
-  const origin =
-    typeof window !== 'undefined'
-      ? window.location.origin
-      : 'https://flickpick.mel-2cb.workers.dev'
-  return `${origin}${pathname.startsWith('/') ? pathname : `/${pathname}`}`
+  const path = pathname.startsWith('/') ? pathname : `/${pathname}`
+  return `${SITE_ORIGIN}${path}`
 }

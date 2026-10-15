@@ -39,6 +39,7 @@ export const Home = () => {
         title="FlickPick"
         description="Browse trending movies, coming soon titles, and a shared watchlist."
         canonical={absoluteUrl('/')}
+        ogType="website"
       />
       <FeatureMovieHero />
       <div className="relative z-10 pb-[calc(5.5rem+env(safe-area-inset-bottom))] sm:pb-16">

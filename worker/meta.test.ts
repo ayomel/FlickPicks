@@ -1,7 +1,8 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import {
   buildMetaTagsHtml,
   escapeHtml,
+  injectMovieMeta,
   movieCanonicalUrl,
   moviePageTitle,
   SITE_ORIGIN,
@@ -38,5 +39,56 @@ describe('movie meta helpers', () => {
     expect(html).toContain('name="twitter:card"')
     expect(html).toContain('rel="canonical"')
     expect(html).not.toContain('name="description"')
+  })
+
+  it('passes a raw description to setAttribute and relies on rewriter escaping', async () => {
+    const setAttribute = vi.fn()
+    class CapturingRewriter {
+      on(
+        selector: string,
+        handlers: {
+          element: (el: {
+            setInnerContent?: (v: string) => void
+            setAttribute?: (name: string, value: string) => void
+            append?: (html: string, opts: { html: boolean }) => void
+          }) => void
+        },
+      ) {
+        if (selector === 'meta[name="description"]') {
+          handlers.element({ setAttribute })
+        } else {
+          handlers.element({
+            setInnerContent: () => {},
+            append: () => {},
+          })
+        }
+        return this
+      }
+      transform(response: Response) {
+        return response
+      }
+    }
+    vi.stubGlobal('HTMLRewriter', CapturingRewriter)
+
+    const shell = new Response(
+      '<!doctype html><html><head><title>FlickPick</title><meta name="description" content="old" /></head><body></body></html>',
+      { headers: { 'content-type': 'text/html' } },
+    )
+
+    await injectMovieMeta(shell, {
+      id: 603,
+      title: 'The Matrix',
+      overview: 'A <hacker> joins "rebels".',
+    })
+
+    expect(setAttribute).toHaveBeenCalledWith(
+      'content',
+      'A <hacker> joins "rebels".',
+    )
+    expect(escapeHtml('A <hacker> joins "rebels".')).toBe(
+      'A &lt;hacker&gt; joins &quot;rebels&quot;.',
+    )
+
+    vi.unstubAllGlobals()
   })
 })
