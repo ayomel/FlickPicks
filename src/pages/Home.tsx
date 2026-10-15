@@ -8,6 +8,7 @@ import { Seo } from '@/components/Seo'
 import { useTrendingQuery } from '@/hooks/useTrendingQuery'
 import { useUpcomingQuery } from '@/hooks/useUpcomingQuery'
 import { useWatchlistMovies } from '@/hooks/useWatchlistQuery'
+import { absoluteUrl } from '@/utils/seo'
 
 export const Home = () => {
   const location = useLocation()
@@ -37,6 +38,7 @@ export const Home = () => {
       <Seo
         title="FlickPick"
         description="Browse trending movies, coming soon titles, and a shared watchlist."
+        canonical={absoluteUrl('/')}
       />
       <FeatureMovieHero />
       <div className="relative z-10 pb-[calc(5.5rem+env(safe-area-inset-bottom))] sm:pb-16">

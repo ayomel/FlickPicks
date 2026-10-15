@@ -4,11 +4,16 @@ import type { Env } from './index'
 import { escapeHtml } from './meta'
 
 const SHELL_HTML =
-  '<!doctype html><html><head><title>FlickPick</title></head><body><div id="root"></div></body></html>'
+  '<!doctype html><html><head><title>FlickPick</title><meta name="description" content="Browse trending movies, coming soon titles, and a shared watchlist." /></head><body><div id="root"></div></body></html>'
 
 class FakeHTMLRewriter {
   private titleHandler?: {
     element: (el: { setInnerContent: (v: string) => void }) => void
+  }
+  private descriptionHandler?: {
+    element: (el: {
+      setAttribute: (name: string, value: string) => void
+    }) => void
   }
   private headHandler?: {
     element: (el: {
@@ -18,6 +23,8 @@ class FakeHTMLRewriter {
 
   on(selector: string, handlers: { element: (el: never) => void }) {
     if (selector === 'title') this.titleHandler = handlers
+    if (selector === 'meta[name="description"]')
+      this.descriptionHandler = handlers
     if (selector === 'head') this.headHandler = handlers
     return this
   }
@@ -35,6 +42,18 @@ class FakeHTMLRewriter {
         html = html.replace(
           /<title>.*?<\/title>/,
           `<title>${titleText}</title>`,
+        )
+      }
+      if (this.descriptionHandler) {
+        let content = ''
+        this.descriptionHandler.element({
+          setAttribute(name: string, value: string) {
+            if (name === 'content') content = value
+          },
+        })
+        html = html.replace(
+          /<meta\s+name="description"\s+content="[^"]*"\s*\/?>/,
+          `<meta name="description" content="${content}" />`,
         )
       }
       if (this.headHandler) {
@@ -61,12 +80,14 @@ const requestUrl = (input: RequestInfo | URL) => {
 }
 
 const createAssets = (
-  files: Record<string, { body: string; type: string }>,
+  files: Record<string, { body: string; type: string; etag?: string }>,
 ): Env['ASSETS'] => {
   return {
     async fetch(input: RequestInfo | URL) {
       const url = requestUrl(input)
       const pathname = url.pathname
+      const incoming =
+        input instanceof Request ? input : new Request(url.toString())
 
       // Mimic ASSETS: /index.html redirects to /
       if (pathname === '/index.html') {
@@ -75,9 +96,26 @@ const createAssets = (
 
       const file = files[pathname]
       if (file) {
+        const etag = file.etag ?? '"shell-v1"'
+        if (
+          incoming.headers.get('If-None-Match') === etag ||
+          incoming.headers.has('If-Modified-Since')
+        ) {
+          return new Response(null, {
+            status: 304,
+            headers: {
+              ETag: etag,
+              'Last-Modified': 'Wed, 15 Oct 2025 00:00:00 GMT',
+            },
+          })
+        }
         return new Response(file.body, {
           status: 200,
-          headers: { 'content-type': file.type },
+          headers: {
+            'content-type': file.type,
+            ETag: etag,
+            'Last-Modified': 'Wed, 15 Oct 2025 00:00:00 GMT',
+          },
         })
       }
 
@@ -94,18 +132,18 @@ const createAssets = (
 }
 
 const envWith = (
-  files: Record<string, { body: string; type: string }>,
+  files: Record<string, { body: string; type: string; etag?: string }>,
 ): Env => ({
   ASSETS: createAssets(files),
 })
 
-const request = (path: string) =>
+const request = (path: string, headers?: HeadersInit) =>
   new Request(`https://flickpick.example${path}`, {
-    headers: { accept: 'text/html' },
+    headers: { accept: 'text/html', ...headers },
   })
 
-const handle = (path: string, env: Env) =>
-  worker.fetch(request(path), env, {} as ExecutionContext)
+const handle = (path: string, env: Env, headers?: HeadersInit) =>
+  worker.fetch(request(path, headers), env, {} as ExecutionContext)
 
 describe('worker fetch handler', () => {
   const files = {
@@ -167,7 +205,7 @@ describe('worker fetch handler', () => {
     expect(missingPng.status).toBe(404)
   })
 
-  it('injects escaped movie meta for /movies/:id when the API succeeds', async () => {
+  it('injects escaped movie meta once for /movies/:id when the API succeeds', async () => {
     const fetchMock = vi.fn().mockResolvedValue(
       new Response(
         JSON.stringify({
@@ -186,10 +224,16 @@ describe('worker fetch handler', () => {
 
     expect(response.status).toBe(200)
     expect(html).toContain('<title>The Matrix &amp; Co · FlickPick</title>')
-    expect(html).toContain('A &lt;hacker&gt; joins rebels.')
+    expect(html).toContain(
+      'name="description" content="A &lt;hacker&gt; joins rebels."',
+    )
+    expect(html.match(/name="description"/g)).toHaveLength(1)
+    expect(html).toContain('property="og:type" content="video.movie"')
     expect(html).toContain('property="og:title"')
     expect(html).toContain('rel="canonical"')
     expect(html).toContain('https://flickpick.mel-2cb.workers.dev/movies/603')
+    expect(response.headers.get('ETag')).toBeNull()
+    expect(response.headers.get('Last-Modified')).toBeNull()
     expect(fetchMock).toHaveBeenCalled()
   })
 
@@ -205,6 +249,77 @@ describe('worker fetch handler', () => {
     expect(response.status).toBe(200)
     expect(html).toContain('<title>FlickPick</title>')
     expect(html).not.toContain('property="og:title"')
+  })
+
+  it('falls back to the plain shell when the movie API fetch hangs past timeout', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(
+        (_input: RequestInfo | URL, init?: RequestInit) =>
+          new Promise((_resolve, reject) => {
+            init?.signal?.addEventListener('abort', () => {
+              reject(
+                new DOMException('The operation was aborted.', 'AbortError'),
+              )
+            })
+          }),
+      ),
+    )
+
+    const response = await handle('/movies/603', envWith(files))
+    const html = await response.text()
+
+    expect(response.status).toBe(200)
+    expect(html).toContain('<title>FlickPick</title>')
+    expect(html).not.toContain('property="og:title"')
+  })
+
+  it('strips conditional request headers so rewritten movie pages are not 304', async () => {
+    const fetchMock = vi.fn().mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          id: 603,
+          title: 'The Matrix',
+          overview: 'A computer hacker joins rebels.',
+        }),
+        { status: 200, headers: { 'content-type': 'application/json' } },
+      ),
+    )
+    vi.stubGlobal('fetch', fetchMock)
+
+    let seenIfNoneMatch: string | null = 'unset'
+    const env: Env = {
+      ASSETS: {
+        async fetch(input: RequestInfo | URL) {
+          const incoming =
+            input instanceof Request ? input : new Request(String(input))
+          seenIfNoneMatch = incoming.headers.get('If-None-Match')
+          return new Response(SHELL_HTML, {
+            status: 200,
+            headers: {
+              'content-type': 'text/html; charset=utf-8',
+              ETag: '"shell-v1"',
+              'Last-Modified': 'Wed, 15 Oct 2025 00:00:00 GMT',
+            },
+          })
+        },
+        connect() {
+          throw new Error('ASSETS.connect is not used in these tests')
+        },
+      } as Env['ASSETS'],
+    }
+
+    const response = await handle('/movies/603', env, {
+      'If-None-Match': '"shell-v1"',
+      'If-Modified-Since': 'Wed, 15 Oct 2025 00:00:00 GMT',
+    })
+    const html = await response.text()
+
+    expect(seenIfNoneMatch).toBeNull()
+    expect(response.status).toBe(200)
+    expect(html).toContain('property="og:title"')
+    expect(response.headers.get('ETag')).toBeNull()
+    expect(response.headers.get('Last-Modified')).toBeNull()
   })
 
   it('fetches the shell from / instead of following /index.html redirects', async () => {

@@ -1,14 +1,17 @@
 import { isAppShellPath, isStaticAssetPath } from './routes'
-import { fetchMovieMeta, injectMovieMeta } from './meta'
+import { DEFAULT_API_ORIGIN, fetchMovieMeta, injectMovieMeta } from './meta'
 
 export interface Env {
   ASSETS: Fetcher
+  API_ORIGIN?: string
 }
 
-const fetchShell = (request: Request, env: Env) =>
-  env.ASSETS.fetch(
-    new Request(new URL('/', request.url), { headers: request.headers }),
-  )
+const fetchShell = (request: Request, env: Env) => {
+  const headers = new Headers(request.headers)
+  headers.delete('If-None-Match')
+  headers.delete('If-Modified-Since')
+  return env.ASSETS.fetch(new Request(new URL('/', request.url), { headers }))
+}
 
 const isHtmlResponse = (response: Response) => {
   const contentType = response.headers.get('content-type') ?? ''
@@ -38,7 +41,10 @@ export default {
     const movieId = movieIdFromPath(pathname)
 
     if (movieId) {
-      const movie = await fetchMovieMeta(movieId)
+      const movie = await fetchMovieMeta(
+        movieId,
+        env.API_ORIGIN ?? DEFAULT_API_ORIGIN,
+      )
       if (movie) {
         return injectMovieMeta(shell, movie)
       }
