@@ -41,10 +41,6 @@ export const HeroBackdrop = ({
         onError={() => setImageFailed(true)}
         className="absolute inset-0 size-full object-cover"
       />
-      <div
-        className="absolute inset-y-0 left-0 w-[min(100%,calc(42rem+2.5rem))] bg-linear-to-r from-background via-background/90 via-80% to-background/90"
-        aria-hidden
-      />
     </div>
   )
 }
