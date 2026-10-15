@@ -1,15 +1,13 @@
 import { useParams } from 'react-router-dom'
 import axios from 'axios'
-import {
-  isNumericMovieId,
-  useMovieDetailsQuery,
-} from '@/hooks/useMovieDetailsQuery'
+import { useMovieDetailsQuery } from '@/hooks/useMovieDetailsQuery'
 import { MovieHero } from '@/components/MovieDetails/MovieHero'
 import { MovieOverview } from '@/components/MovieDetails/MovieOverview'
 import { WatchProviders } from '@/components/MovieDetails/WatchProviders'
 import { MovieDetailsInfo } from '@/components/MovieDetails/MovieDetailsInfo'
 import { MovieDetailsSkeleton } from '@/components/MovieDetails/MovieDetailsSkeleton'
 import { MovieDetailsError } from '@/components/MovieDetails/MovieDetailsError'
+import { isNumericMovieId } from '@/utils/isNumericMovieId'
 
 export const MovieDetails = () => {
   const { id } = useParams()

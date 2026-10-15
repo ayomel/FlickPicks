@@ -5,7 +5,9 @@ type MovieDetailsErrorProps = {
   notFound?: boolean
 }
 
-export const MovieDetailsError = ({ notFound = false }: MovieDetailsErrorProps) => {
+export const MovieDetailsError = ({
+  notFound = false,
+}: MovieDetailsErrorProps) => {
   return (
     <div className="flex min-h-svh flex-col items-center justify-center gap-4 bg-background px-6 pt-16 text-center">
       <h1 className="m-0 text-2xl font-semibold tracking-tight text-foreground">

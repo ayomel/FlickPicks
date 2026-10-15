@@ -17,8 +17,7 @@ export const useWatchlistQuery = () => {
 
 export const useIsMovieOnWatchlist = (tmdbId: number) => {
   const { data, isLoading, isFetching } = useWatchlistQuery()
-  const isOnWatchlist =
-    data?.some((entry) => entry.tmdb_id === tmdbId) ?? false
+  const isOnWatchlist = data?.some((entry) => entry.tmdb_id === tmdbId) ?? false
 
   return {
     isOnWatchlist,
@@ -64,6 +63,7 @@ export const useWatchlistMovies = () => {
     tmdbIds,
     movies,
     isLoadingMovies,
-    isError: entriesQuery.isError || movieQueries.some((query) => query.isError),
+    isError:
+      entriesQuery.isError || movieQueries.some((query) => query.isError),
   }
 }

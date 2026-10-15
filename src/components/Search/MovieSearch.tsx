@@ -20,11 +20,14 @@ export const MovieSearch = () => {
   const [activeIndex, setActiveIndex] = useState(0)
 
   const debouncedQuery = useDebouncedValue(query, 300)
-  const { data: results = [], isLoading, isError } = useSearchQuery(debouncedQuery)
+  const {
+    data: results = [],
+    isLoading,
+    isError,
+  } = useSearchQuery(debouncedQuery)
 
   const trimmedDebounced = debouncedQuery.trim()
-  const showDropdown =
-    open && trimmedDebounced.length >= MIN_SEARCH_LENGTH
+  const showDropdown = open && trimmedDebounced.length >= MIN_SEARCH_LENGTH
 
   const selectMovie = useCallback(
     (id: number) => {
@@ -36,9 +39,12 @@ export const MovieSearch = () => {
     [navigate],
   )
 
-  useEffect(() => {
+  const resultsKey = results.map((movie) => movie.id).join(',')
+  const [indexedResultsKey, setIndexedResultsKey] = useState(resultsKey)
+  if (resultsKey !== indexedResultsKey) {
+    setIndexedResultsKey(resultsKey)
     setActiveIndex(0)
-  }, [results])
+  }
 
   useEffect(() => {
     const handlePointerDown = (event: MouseEvent) => {
@@ -66,9 +72,9 @@ export const MovieSearch = () => {
     return () => document.removeEventListener('keydown', handleKeyDown)
   }, [])
 
-  const handleInputKeyDown: ComponentProps<
-    typeof SearchInput
-  >['onKeyDown'] = (event) => {
+  const handleInputKeyDown: ComponentProps<typeof SearchInput>['onKeyDown'] = (
+    event,
+  ) => {
     if (event.key === 'Escape') {
       setOpen(false)
       inputRef.current?.blur()

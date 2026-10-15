@@ -46,7 +46,10 @@ export const FeatureMovieHero = () => {
       onFocusCapture={() => setPaused(true)}
       onBlurCapture={(event) => {
         const nextFocus = event.relatedTarget
-        if (!(nextFocus instanceof Node) || !event.currentTarget.contains(nextFocus)) {
+        if (
+          !(nextFocus instanceof Node) ||
+          !event.currentTarget.contains(nextFocus)
+        ) {
           setPaused(false)
         }
       }}
