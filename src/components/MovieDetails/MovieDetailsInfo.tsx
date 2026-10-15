@@ -9,6 +9,11 @@ import {
   getStudioNames,
   resolvePosterUrl,
 } from '@/utils/formatMovie'
+import {
+  getPosterPath,
+  getPosterSrcSetDetail,
+  POSTER_SIZES_DETAIL,
+} from '@/utils/getPosterPath'
 
 type DetailItemProps = {
   label: string
@@ -34,7 +39,12 @@ type MovieDetailsInfoProps = {
 
 export const MovieDetailsInfo = ({ movie }: MovieDetailsInfoProps) => {
   const [posterFailed, setPosterFailed] = useState(false)
-  const posterUrl = resolvePosterUrl(movie)
+  const posterPath = movie.poster_path
+  const absolutePoster =
+    !posterPath && movie.poster?.startsWith('http') ? movie.poster : null
+  const posterUrl = posterPath
+    ? getPosterPath(posterPath)
+    : (absolutePoster ?? resolvePosterUrl(movie))
   const showPoster = Boolean(posterUrl) && !posterFailed
   const countries = getCountryNames(movie)
   const studios = getStudioNames(movie)
@@ -47,10 +57,12 @@ export const MovieDetailsInfo = ({ movie }: MovieDetailsInfoProps) => {
         {showPoster && posterUrl ? (
           <img
             src={posterUrl}
+            srcSet={posterPath ? getPosterSrcSetDetail(posterPath) : undefined}
+            sizes={posterPath ? POSTER_SIZES_DETAIL : undefined}
             alt={`${movie.title} poster`}
             width={342}
             height={513}
-            loading="lazy"
+            loading="eager"
             decoding="async"
             onError={() => setPosterFailed(true)}
             className="aspect-[2/3] w-full object-cover"

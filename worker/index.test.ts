@@ -48,7 +48,7 @@ class FakeHTMLRewriter {
         let content = ''
         this.descriptionHandler.element({
           setAttribute(name: string, value: string) {
-            // Match HTMLRewriter: callers pass raw text; serialization escapes.
+            // HTMLRewriter escapes attribute values, so callers pass raw text.
             if (name === 'content') content = escapeHtml(value)
           },
         })

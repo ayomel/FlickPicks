@@ -56,6 +56,10 @@ describe('VideosRow', () => {
     ).toBeInTheDocument()
     expect(screen.queryByText('Other')).not.toBeInTheDocument()
 
+    const thumb = screen.getByRole('presentation')
+    expect(thumb).toHaveAttribute('width', '480')
+    expect(thumb).toHaveAttribute('height', '270')
+
     await user.click(
       screen.getByRole('button', {
         name: 'Play Official Trailer, Trailer, Official',

@@ -6,6 +6,7 @@ type SeoProps = {
   canonical?: string
   ogType?: string
   ogImage?: string | null
+  shareable?: boolean
 }
 
 const upsertMeta = (
@@ -57,20 +58,24 @@ export const Seo = ({
   canonical,
   ogType,
   ogImage,
+  shareable = false,
 }: SeoProps) => {
   useLayoutEffect(() => {
     document.title = title
 
-    if (description) {
-      upsertMeta('name', 'description', description)
-      upsertMeta('property', 'og:description', description)
+    if (description) upsertMeta('name', 'description', description)
+    else removeMeta('name', 'description')
+
+    if (shareable) {
+      upsertMeta('property', 'og:title', title)
+      upsertMeta('name', 'twitter:card', 'summary_large_image')
+      if (description) upsertMeta('property', 'og:description', description)
+      else removeMeta('property', 'og:description')
     } else {
-      removeMeta('name', 'description')
+      removeMeta('property', 'og:title')
+      removeMeta('name', 'twitter:card')
       removeMeta('property', 'og:description')
     }
-
-    upsertMeta('property', 'og:title', title)
-    upsertMeta('name', 'twitter:card', 'summary_large_image')
 
     if (ogType) upsertMeta('property', 'og:type', ogType)
     else removeMeta('property', 'og:type')
@@ -85,7 +90,7 @@ export const Seo = ({
       removeMeta('property', 'og:url')
       removeCanonical()
     }
-  }, [title, description, canonical, ogType, ogImage])
+  }, [title, description, canonical, ogType, ogImage, shareable])
 
   return null
 }

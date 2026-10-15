@@ -42,6 +42,7 @@ describe('Seo', () => {
         canonical={`${SITE_ORIGIN}/movies/603`}
         ogType="video.movie"
         ogImage="https://image.tmdb.org/t/p/w780/matrix.jpg"
+        shareable
       />,
     )
 
@@ -56,6 +57,9 @@ describe('Seo', () => {
       'content',
       'A computer hacker joins rebels.',
     )
+    expect(
+      document.querySelector('meta[property="og:description"]'),
+    ).toHaveAttribute('content', 'A computer hacker joins rebels.')
     expect(document.querySelector('meta[property="og:type"]')).toHaveAttribute(
       'content',
       'video.movie',
@@ -74,6 +78,7 @@ describe('Seo', () => {
         canonical={`${SITE_ORIGIN}/movies/603`}
         ogType="video.movie"
         ogImage="https://image.tmdb.org/t/p/w780/matrix.jpg"
+        shareable
       />,
     )
 
@@ -89,6 +94,7 @@ describe('Seo', () => {
         description="Browse trending movies, coming soon titles, and a shared watchlist."
         canonical={`${SITE_ORIGIN}/`}
         ogType="website"
+        shareable
       />,
     )
 
@@ -112,7 +118,7 @@ describe('Seo', () => {
     )
   })
 
-  it('clears canonical and og:url when navigating to a 404 page', async () => {
+  it('clears share tags when navigating to a 404 page', async () => {
     const { rerender } = render(
       <Seo
         title="The Matrix · FlickPick"
@@ -120,6 +126,7 @@ describe('Seo', () => {
         canonical={`${SITE_ORIGIN}/movies/603`}
         ogType="video.movie"
         ogImage="https://image.tmdb.org/t/p/w780/matrix.jpg"
+        shareable
       />,
     )
 
@@ -139,8 +146,21 @@ describe('Seo', () => {
     await waitFor(() => {
       expect(document.title).toBe('Page not found · FlickPick')
     })
+    expect(document.querySelector('meta[name="description"]')).toHaveAttribute(
+      'content',
+      'This FlickPick page does not exist.',
+    )
+    expect(
+      document.querySelector('meta[property="og:description"]'),
+    ).not.toBeInTheDocument()
     expect(
       document.querySelector('meta[property="og:type"]'),
+    ).not.toBeInTheDocument()
+    expect(
+      document.querySelector('meta[property="og:title"]'),
+    ).not.toBeInTheDocument()
+    expect(
+      document.querySelector('meta[name="twitter:card"]'),
     ).not.toBeInTheDocument()
     expect(
       document.querySelector('meta[property="og:image"]'),

@@ -50,7 +50,7 @@ describe('PosterCard', () => {
     expect(document.querySelector('svg')).toBeTruthy()
   })
 
-  it('uses a real poster alt text', () => {
+  it('uses a real poster alt text and responsive srcset', () => {
     render(
       <MemoryRouter>
         <PosterCard
@@ -64,8 +64,18 @@ describe('PosterCard', () => {
       </MemoryRouter>,
     )
 
-    expect(
-      screen.getByRole('img', { name: 'Fight Club poster' }),
-    ).toBeInTheDocument()
+    const image = screen.getByRole('img', { name: 'Fight Club poster' })
+    expect(image).toHaveAttribute(
+      'src',
+      'https://image.tmdb.org/t/p/w342/fight.jpg',
+    )
+    expect(image).toHaveAttribute(
+      'srcSet',
+      'https://image.tmdb.org/t/p/w185/fight.jpg 185w, https://image.tmdb.org/t/p/w342/fight.jpg 342w',
+    )
+    expect(image).toHaveAttribute('loading', 'lazy')
+    expect(image).toHaveAttribute('decoding', 'async')
+    expect(image).toHaveAttribute('width', '342')
+    expect(image).toHaveAttribute('height', '513')
   })
 })
