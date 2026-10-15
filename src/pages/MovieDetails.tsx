@@ -1,5 +1,9 @@
 import { useParams } from 'react-router-dom'
-import { useMovieDetailsQuery } from '@/hooks/useMovieDetailsQuery'
+import axios from 'axios'
+import {
+  isNumericMovieId,
+  useMovieDetailsQuery,
+} from '@/hooks/useMovieDetailsQuery'
 import { MovieHero } from '@/components/MovieDetails/MovieHero'
 import { MovieOverview } from '@/components/MovieDetails/MovieOverview'
 import { WatchProviders } from '@/components/MovieDetails/WatchProviders'
@@ -9,10 +13,22 @@ import { MovieDetailsError } from '@/components/MovieDetails/MovieDetailsError'
 
 export const MovieDetails = () => {
   const { id } = useParams()
-  const { data, isLoading, isError } = useMovieDetailsQuery(id)
+  const idIsValid = isNumericMovieId(id)
+  const { data, isLoading, isError, error } = useMovieDetailsQuery(id)
+
+  if (!idIsValid) {
+    return <MovieDetailsError notFound />
+  }
 
   if (isLoading) {
     return <MovieDetailsSkeleton />
+  }
+
+  const isNotFound =
+    isError && axios.isAxiosError(error) && error.response?.status === 404
+
+  if (isNotFound) {
+    return <MovieDetailsError notFound />
   }
 
   if (isError || !data) {
