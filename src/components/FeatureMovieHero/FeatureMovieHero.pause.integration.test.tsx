@@ -1,4 +1,4 @@
-import { act, cleanup, fireEvent, render, screen } from '@testing-library/react'
+import { act, cleanup, render, screen } from '@testing-library/react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { MemoryRouter } from 'react-router-dom'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
@@ -104,6 +104,33 @@ const renderHero = () => {
   )
 }
 
+/** Native dispatch so leave→enter can share one React batch (RTL fireEvent flushes). */
+const mouseOver = (
+  target: Element,
+  relatedTarget: EventTarget | null = null,
+) => {
+  target.dispatchEvent(
+    new MouseEvent('mouseover', {
+      bubbles: true,
+      cancelable: true,
+      relatedTarget,
+    }),
+  )
+}
+
+const mouseOut = (
+  target: Element,
+  relatedTarget: EventTarget | null = null,
+) => {
+  target.dispatchEvent(
+    new MouseEvent('mouseout', {
+      bubbles: true,
+      cancelable: true,
+      relatedTarget,
+    }),
+  )
+}
+
 describe('FeatureMovieHero pause integration', () => {
   it('keeps autoplay paused when moving straight from content to controls', () => {
     vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout', 'performance'] })
@@ -113,18 +140,21 @@ describe('FeatureMovieHero pause integration', () => {
       screen.getByRole('heading', { name: 'Fight Club' }),
     ).toBeInTheDocument()
 
-    const contentHotzone = screen
-      .getByRole('heading', { name: 'Fight Club' })
-      .closest('.absolute')!.parentElement!
-    const controlsHotzone = screen
-      .getByRole('button', { name: 'Next movie' })
-      .closest('.absolute')!.parentElement!
-
-    fireEvent.mouseEnter(contentHotzone)
+    const contentHotzone = screen.getByTestId('hero-content-hotzone')
+    const controlsHotzone = screen.getByTestId('hero-controls-hotzone')
 
     act(() => {
-      fireEvent.mouseLeave(contentHotzone)
-      fireEvent.mouseEnter(controlsHotzone)
+      mouseOver(contentHotzone)
+    })
+
+    // Leave→enter in one batch (no flush between). Advance timers in a later
+    // act so a stale setPaused unpause can arm its timeout first.
+    act(() => {
+      mouseOut(contentHotzone, controlsHotzone)
+      mouseOver(controlsHotzone, contentHotzone)
+    })
+
+    act(() => {
       vi.advanceTimersByTime(HERO_INTERVAL_MS + 100)
     })
 

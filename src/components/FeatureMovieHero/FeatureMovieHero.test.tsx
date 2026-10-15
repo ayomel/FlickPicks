@@ -119,21 +119,15 @@ describe('FeatureMovieHero', () => {
     const section = container.querySelector('section')
     expect(section).toBeTruthy()
 
-    fireEvent.mouseEnter(section!)
+    fireEvent.mouseOver(section!)
     expect(setContentHovered).not.toHaveBeenCalled()
     expect(setControlsHovered).not.toHaveBeenCalled()
 
-    const contentRoot = screen
-      .getByRole('heading', { name: 'Fight Club' })
-      .closest('.absolute')
-    fireEvent.mouseEnter(contentRoot!.parentElement!)
+    fireEvent.mouseOver(screen.getByTestId('hero-content-hotzone'))
     expect(setContentHovered).toHaveBeenCalledWith(true)
 
     setContentHovered.mockClear()
-    const controlsRoot = screen
-      .getByRole('button', { name: 'Next movie' })
-      .closest('.absolute')
-    fireEvent.mouseEnter(controlsRoot!.parentElement!)
+    fireEvent.mouseOver(screen.getByTestId('hero-controls-hotzone'))
     expect(setControlsHovered).toHaveBeenCalledWith(true)
 
     setFocused.mockClear()
@@ -144,19 +138,14 @@ describe('FeatureMovieHero', () => {
   it('keeps hover flags independent when moving from content to controls', () => {
     renderHero()
 
-    const contentRoot = screen
-      .getByRole('heading', { name: 'Fight Club' })
-      .closest('.absolute')
-    const contentHotzone = contentRoot!.parentElement!
-    const controlsHotzone = screen
-      .getByRole('button', { name: 'Next movie' })
-      .closest('.absolute')!.parentElement!
+    const contentHotzone = screen.getByTestId('hero-content-hotzone')
+    const controlsHotzone = screen.getByTestId('hero-controls-hotzone')
 
-    fireEvent.mouseEnter(contentHotzone)
+    fireEvent.mouseOver(contentHotzone)
     expect(setContentHovered).toHaveBeenCalledWith(true)
 
-    fireEvent.mouseLeave(contentHotzone)
-    fireEvent.mouseEnter(controlsHotzone)
+    fireEvent.mouseOut(contentHotzone, { relatedTarget: controlsHotzone })
+    fireEvent.mouseOver(controlsHotzone, { relatedTarget: contentHotzone })
     expect(setContentHovered).toHaveBeenCalledWith(false)
     expect(setControlsHovered).toHaveBeenCalledWith(true)
   })

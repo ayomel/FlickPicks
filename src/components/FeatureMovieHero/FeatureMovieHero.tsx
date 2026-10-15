@@ -80,8 +80,14 @@ export const FeatureMovieHero = () => {
       />
       <HeroOverlay />
       <div
-        onMouseEnter={() => setContentHovered(true)}
-        onMouseLeave={() => setContentHovered(false)}
+        data-testid="hero-content-hotzone"
+        onMouseOver={() => setContentHovered(true)}
+        onMouseOut={(event) => {
+          const next = event.relatedTarget
+          if (!(next instanceof Node) || !event.currentTarget.contains(next)) {
+            setContentHovered(false)
+          }
+        }}
       >
         <HeroContent>
           <HeroRankTag rank={index + 1} />
@@ -92,8 +98,14 @@ export const FeatureMovieHero = () => {
         </HeroContent>
       </div>
       <div
-        onMouseEnter={() => setControlsHovered(true)}
-        onMouseLeave={() => setControlsHovered(false)}
+        data-testid="hero-controls-hotzone"
+        onMouseOver={() => setControlsHovered(true)}
+        onMouseOut={(event) => {
+          const next = event.relatedTarget
+          if (!(next instanceof Node) || !event.currentTarget.contains(next)) {
+            setControlsHovered(false)
+          }
+        }}
       >
         <HeroControls
           index={index}
