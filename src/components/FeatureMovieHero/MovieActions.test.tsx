@@ -45,7 +45,7 @@ const movie = {
 } satisfies FeaturedMovie
 
 describe('MovieActions', () => {
-  it('makes More info the primary action', () => {
+  it('makes More info a single link tab stop', () => {
     const client = new QueryClient()
     render(
       <QueryClientProvider client={client}>
@@ -57,5 +57,6 @@ describe('MovieActions', () => {
 
     const moreInfo = screen.getByRole('link', { name: /more info/i })
     expect(moreInfo).toHaveAttribute('href', '/movies/550')
+    expect(screen.queryByRole('button', { name: /more info/i })).toBeNull()
   })
 })

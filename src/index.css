@@ -120,3 +120,13 @@ body {
     @apply m-0 font-heading font-extrabold tracking-tight text-foreground;
   }
 }
+
+@keyframes hero-progress-fill {
+  from {
+    transform: scaleX(0);
+  }
+
+  to {
+    transform: scaleX(1);
+  }
+}

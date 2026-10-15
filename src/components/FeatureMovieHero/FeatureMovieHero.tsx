@@ -22,8 +22,16 @@ const HeroFrame = ({ children }: { children: string }) => {
 export const FeatureMovieHero = () => {
   const { data, isLoading, isError } = useTrendingQuery()
   const movies = data?.results.filter(hasBackdrop) ?? []
-  const { index, progress, next, prev, goTo, setPaused, reducedMotion } =
-    useHeroSlideshow(movies.length)
+  const {
+    index,
+    progress,
+    playing,
+    next,
+    prev,
+    goTo,
+    setPaused,
+    reducedMotion,
+  } = useHeroSlideshow(movies.length)
   const movie = movies[index]
 
   if (isLoading) {
@@ -70,6 +78,7 @@ export const FeatureMovieHero = () => {
         index={index}
         count={movies.length}
         progress={progress}
+        playing={playing}
         onPrev={prev}
         onNext={next}
         onGoTo={goTo}

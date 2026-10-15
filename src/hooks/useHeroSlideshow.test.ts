@@ -43,4 +43,33 @@ describe('useHeroSlideshow', () => {
 
     expect(result.current.index).toBe(1)
   })
+
+  it('resumes from the frozen progress after pause', () => {
+    vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout', 'performance'] })
+    const { result } = renderHook(() => useHeroSlideshow(3))
+
+    act(() => {
+      vi.advanceTimersByTime(2000)
+      result.current.setPaused(true)
+    })
+
+    expect(result.current.progress).toBeGreaterThan(0.2)
+    expect(result.current.progress).toBeLessThan(0.5)
+    expect(result.current.playing).toBe(false)
+
+    act(() => {
+      result.current.setPaused(false)
+    })
+
+    const remaining = HERO_INTERVAL_MS * (1 - result.current.progress)
+    act(() => {
+      vi.advanceTimersByTime(remaining - 50)
+    })
+    expect(result.current.index).toBe(0)
+
+    act(() => {
+      vi.advanceTimersByTime(100)
+    })
+    expect(result.current.index).toBe(1)
+  })
 })

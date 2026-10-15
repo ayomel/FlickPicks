@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 export const HERO_INTERVAL_MS = 6000
 
@@ -22,11 +22,13 @@ const wrapIndex = (value: number, length: number) =>
 
 export const useHeroSlideshow = (length: number) => {
   const [rawIndex, setRawIndex] = useState(0)
-  const [paused, setPaused] = useState(false)
+  const [paused, setPausedState] = useState(false)
   const [progress, setProgress] = useState(0)
   const [progressRawIndex, setProgressRawIndex] = useState(0)
+  const animStartedAtRef = useRef<number | null>(null)
   const reducedMotion = usePrefersReducedMotion()
   const index = wrapIndex(rawIndex, length)
+  const playing = length > 1 && !paused && !reducedMotion
 
   if (progressRawIndex !== rawIndex) {
     setProgressRawIndex(rawIndex)
@@ -34,28 +36,38 @@ export const useHeroSlideshow = (length: number) => {
   }
 
   useEffect(() => {
-    if (length <= 1 || paused || reducedMotion) {
+    if (!playing) {
+      animStartedAtRef.current = null
       return
     }
 
-    const start = performance.now()
-    let frame = 0
+    // Resume from the frozen progress instead of restarting the slide.
+    const start = performance.now() - progress * HERO_INTERVAL_MS
+    animStartedAtRef.current = start
+    const remaining = Math.max(0, HERO_INTERVAL_MS * (1 - progress))
 
-    const tick = (now: number) => {
-      const nextProgress = Math.min(1, (now - start) / HERO_INTERVAL_MS)
-      setProgress(nextProgress)
+    const timer = window.setTimeout(() => {
+      setProgress(0)
+      setRawIndex((current) => current + 1)
+    }, remaining)
 
-      if (nextProgress >= 1) {
-        setRawIndex((current) => current + 1)
-        return
-      }
+    return () => {
+      window.clearTimeout(timer)
+    }
+    // progress is sampled when playback starts or resumes, not tracked per frame
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- intentional freeze/resume
+  }, [playing, rawIndex, length])
 
-      frame = window.requestAnimationFrame(tick)
+  const setPaused = (nextPaused: boolean) => {
+    if (nextPaused === paused) return
+
+    if (nextPaused && animStartedAtRef.current != null) {
+      const elapsed = performance.now() - animStartedAtRef.current
+      setProgress(Math.min(1, Math.max(0, elapsed / HERO_INTERVAL_MS)))
     }
 
-    frame = window.requestAnimationFrame(tick)
-    return () => window.cancelAnimationFrame(frame)
-  }, [length, paused, reducedMotion, rawIndex])
+    setPausedState(nextPaused)
+  }
 
   const goTo = (nextIndex: number) => {
     if (length === 0) return
@@ -72,5 +84,14 @@ export const useHeroSlideshow = (length: number) => {
     setRawIndex((current) => current - 1)
   }
 
-  return { index, progress, next, prev, goTo, setPaused, reducedMotion }
+  return {
+    index,
+    progress,
+    playing,
+    next,
+    prev,
+    goTo,
+    setPaused,
+    reducedMotion,
+  }
 }
