@@ -3,7 +3,11 @@ import { Film } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { cn } from '@/lib/utils'
 import { formatReleaseYear } from '@/utils/formatMovie'
-import { getPosterCardPath } from '@/utils/getPosterPath'
+import {
+  getPosterCardPath,
+  getPosterSrcSet,
+  POSTER_SIZES_CARD,
+} from '@/utils/getPosterPath'
 
 export type PosterCardMovie = {
   id: number
@@ -52,6 +56,8 @@ export const PosterCard = ({
         {showImage && posterPath ? (
           <img
             src={getPosterCardPath(posterPath)}
+            srcSet={getPosterSrcSet(posterPath)}
+            sizes={POSTER_SIZES_CARD}
             alt={`${movie.title} poster`}
             width={POSTER_WIDTH}
             height={POSTER_HEIGHT}

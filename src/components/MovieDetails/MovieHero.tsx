@@ -1,7 +1,6 @@
 import { Link } from 'react-router-dom'
 import { ArrowLeft } from 'lucide-react'
 import type { MovieDetails } from '@/types/movieDetails'
-import { resolveBackdropUrl } from '@/utils/formatMovie'
 import { cn } from '@/lib/utils'
 import { HeroBackdrop } from './HeroBackdrop'
 import { MovieHeroOverlays } from './MovieHeroOverlays'
@@ -12,11 +11,13 @@ type MovieHeroProps = {
 }
 
 export const MovieHero = ({ movie }: MovieHeroProps) => {
-  const backdropUrl = resolveBackdropUrl(movie)
+  const backdropPath = movie.backdrop_path
+  const absoluteUrl =
+    !backdropPath && movie.backdrop?.startsWith('http') ? movie.backdrop : null
 
   return (
     <section className="relative min-h-[420px] min-h-[55svh] w-full overflow-hidden bg-background sm:min-h-[520px] sm:min-h-[65svh]">
-      <HeroBackdrop backdropUrl={backdropUrl} />
+      <HeroBackdrop backdropPath={backdropPath} absoluteUrl={absoluteUrl} />
       <MovieHeroOverlays />
       <div className="relative z-10 flex min-h-[420px] min-h-[55svh] flex-col justify-between px-6 pb-10 pt-20 sm:min-h-[520px] sm:min-h-[65svh] sm:px-8 sm:pt-24 lg:px-10">
         <div className="mx-auto w-full max-w-6xl">

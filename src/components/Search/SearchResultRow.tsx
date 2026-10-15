@@ -42,6 +42,10 @@ export const SearchResultRow = ({
           <img
             src={getPosterThumbPath(movie.poster_path)}
             alt={`${movie.title} poster`}
+            width={92}
+            height={138}
+            loading="lazy"
+            decoding="async"
             className="size-full object-cover"
           />
         ) : (

@@ -1,21 +1,42 @@
 import { useState } from 'react'
+import {
+  BACKDROP_SIZES_HERO,
+  getBackdropPath,
+  getBackdropSrcSet,
+} from '@/utils/getPosterPath'
 
 type HeroBackdropProps = {
-  backdropUrl: string | null
+  backdropPath?: string | null
+  absoluteUrl?: string | null
 }
 
-export const HeroBackdrop = ({ backdropUrl }: HeroBackdropProps) => {
-  const [imageFailed, setImageFailed] = useState(false)
-  const showImage = Boolean(backdropUrl) && !imageFailed
+const BACKDROP_WIDTH = 1280
+const BACKDROP_HEIGHT = 720
 
-  if (!showImage || !backdropUrl) {
+export const HeroBackdrop = ({
+  backdropPath,
+  absoluteUrl,
+}: HeroBackdropProps) => {
+  const [imageFailed, setImageFailed] = useState(false)
+  const tmdbSrc = backdropPath ? getBackdropPath(backdropPath) : null
+  const src = tmdbSrc ?? absoluteUrl
+  const showImage = Boolean(src) && !imageFailed
+
+  if (!showImage || !src) {
     return <div className="absolute inset-0 bg-card" aria-hidden />
   }
 
   return (
     <img
-      src={backdropUrl}
+      src={src}
+      srcSet={backdropPath ? getBackdropSrcSet(backdropPath) : undefined}
+      sizes={backdropPath ? BACKDROP_SIZES_HERO : undefined}
       alt=""
+      width={BACKDROP_WIDTH}
+      height={BACKDROP_HEIGHT}
+      loading="eager"
+      decoding="async"
+      fetchPriority="high"
       onError={() => setImageFailed(true)}
       className="absolute inset-0 size-full object-cover opacity-90"
     />

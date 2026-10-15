@@ -3,7 +3,14 @@ import { Film } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { cn } from '@/lib/utils'
 import { formatReleaseYear } from '@/utils/formatMovie'
-import { getBackdropCardPath, getPosterCardPath } from '@/utils/getPosterPath'
+import {
+  BACKDROP_SIZES_CARD,
+  getBackdropCardPath,
+  getBackdropSrcSet,
+  getPosterCardPath,
+  getPosterSrcSet,
+  POSTER_SIZES_CARD,
+} from '@/utils/getPosterPath'
 
 export type BackdropCardMovie = {
   id: number
@@ -41,6 +48,12 @@ export const BackdropCard = ({
     : movie.poster_path
       ? getPosterCardPath(movie.poster_path)
       : null
+  const srcSet = movie.backdrop_path
+    ? getBackdropSrcSet(movie.backdrop_path)
+    : movie.poster_path
+      ? getPosterSrcSet(movie.poster_path)
+      : undefined
+  const sizes = useBackdrop ? BACKDROP_SIZES_CARD : POSTER_SIZES_CARD
   const width = useBackdrop ? BACKDROP_WIDTH : POSTER_WIDTH
   const height = useBackdrop ? BACKDROP_HEIGHT : POSTER_HEIGHT
 
@@ -63,6 +76,8 @@ export const BackdropCard = ({
         {showImage && src ? (
           <img
             src={src}
+            srcSet={srcSet}
+            sizes={sizes}
             alt=""
             width={width}
             height={height}

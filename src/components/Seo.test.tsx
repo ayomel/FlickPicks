@@ -143,6 +143,12 @@ describe('Seo', () => {
       document.querySelector('meta[property="og:type"]'),
     ).not.toBeInTheDocument()
     expect(
+      document.querySelector('meta[property="og:title"]'),
+    ).not.toBeInTheDocument()
+    expect(
+      document.querySelector('meta[name="twitter:card"]'),
+    ).not.toBeInTheDocument()
+    expect(
       document.querySelector('meta[property="og:image"]'),
     ).not.toBeInTheDocument()
     expect(

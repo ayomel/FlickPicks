@@ -69,8 +69,13 @@ export const Seo = ({
       removeMeta('property', 'og:description')
     }
 
-    upsertMeta('property', 'og:title', title)
-    upsertMeta('name', 'twitter:card', 'summary_large_image')
+    if (ogType || canonical) {
+      upsertMeta('property', 'og:title', title)
+      upsertMeta('name', 'twitter:card', 'summary_large_image')
+    } else {
+      removeMeta('property', 'og:title')
+      removeMeta('name', 'twitter:card')
+    }
 
     if (ogType) upsertMeta('property', 'og:type', ogType)
     else removeMeta('property', 'og:type')
