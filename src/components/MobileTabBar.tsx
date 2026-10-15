@@ -53,14 +53,14 @@ export const MobileTabBar = () => {
       const target = event.target
       if (!(target instanceof Node)) return
       if (shellRef.current?.contains(target)) return
-      closeSearch(true)
+      closeSearch()
     }
 
     document.addEventListener('keydown', onKeyDown)
-    document.addEventListener('pointerdown', onPointerDown)
+    document.addEventListener('pointerdown', onPointerDown, true)
     return () => {
       document.removeEventListener('keydown', onKeyDown)
-      document.removeEventListener('pointerdown', onPointerDown)
+      document.removeEventListener('pointerdown', onPointerDown, true)
     }
   }, [searchOpen])
 

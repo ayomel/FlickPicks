@@ -1,11 +1,13 @@
-import { PageSection } from '@/components/ui/page-section'
+import { useState } from 'react'
+import { Film } from 'lucide-react'
+import { Badge } from '@/components/ui/badge'
 import { SectionLabel } from '@/components/ui/section-label'
 import type { MovieDetails } from '@/types/movieDetails'
 import {
-  formatReleaseDate,
-  formatRuntime,
-  getPrimaryLanguage,
+  formatBudget,
+  getCountryNames,
   getStudioNames,
+  resolvePosterUrl,
 } from '@/utils/formatMovie'
 
 type DetailItemProps = {
@@ -17,7 +19,7 @@ const DetailItem = ({ label, value }: DetailItemProps) => {
   if (!value) return null
 
   return (
-    <div className="flex flex-col gap-1.5 rounded-lg border border-border bg-card p-4">
+    <div className="flex flex-col gap-1">
       <dt className="font-mono text-xs font-semibold tracking-[0.08em] text-muted-foreground uppercase">
         {label}
       </dt>
@@ -31,19 +33,57 @@ type MovieDetailsInfoProps = {
 }
 
 export const MovieDetailsInfo = ({ movie }: MovieDetailsInfoProps) => {
+  const [posterFailed, setPosterFailed] = useState(false)
+  const posterUrl = resolvePosterUrl(movie)
+  const showPoster = Boolean(posterUrl) && !posterFailed
+  const countries = getCountryNames(movie)
+  const studios = getStudioNames(movie)
+  const budget = formatBudget(movie.budget)
+  const hasGenres = movie.genres.length > 0
+
   return (
-    <PageSection className="pb-[calc(5.5rem+env(safe-area-inset-bottom))] sm:pb-16">
-      <SectionLabel className="mb-6">Details</SectionLabel>
-      <dl className="m-0 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-        <DetailItem
-          label="Release date"
-          value={formatReleaseDate(movie.release_date)}
-        />
-        <DetailItem label="Runtime" value={formatRuntime(movie.runtime)} />
-        <DetailItem label="Status" value={movie.status || null} />
-        <DetailItem label="Language" value={getPrimaryLanguage(movie)} />
-        <DetailItem label="Studios" value={getStudioNames(movie)} />
+    <aside className="flex flex-col gap-6">
+      <div className="overflow-hidden rounded-md border border-border bg-card">
+        {showPoster && posterUrl ? (
+          <img
+            src={posterUrl}
+            alt=""
+            width={342}
+            height={513}
+            loading="lazy"
+            decoding="async"
+            onError={() => setPosterFailed(true)}
+            className="aspect-[2/3] w-full object-cover"
+          />
+        ) : (
+          <div className="flex aspect-[2/3] w-full items-center justify-center bg-muted">
+            <Film className="size-10 text-muted-foreground" aria-hidden />
+          </div>
+        )}
+      </div>
+
+      {hasGenres ? (
+        <div>
+          <SectionLabel className="mb-3">Genres</SectionLabel>
+          <div className="flex flex-wrap gap-2">
+            {movie.genres.map((genre) => (
+              <Badge
+                key={genre.id}
+                variant="secondary"
+                className="border border-border"
+              >
+                {genre.name}
+              </Badge>
+            ))}
+          </div>
+        </div>
+      ) : null}
+
+      <dl className="m-0 flex flex-col gap-4">
+        <DetailItem label="Countries" value={countries} />
+        <DetailItem label="Studios" value={studios} />
+        <DetailItem label="Budget" value={budget} />
       </dl>
-    </PageSection>
+    </aside>
   )
 }

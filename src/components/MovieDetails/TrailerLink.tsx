@@ -1,4 +1,4 @@
-import { ExternalLink } from 'lucide-react'
+import { Play } from 'lucide-react'
 import { LinkButton } from '@/components/ui/button'
 import type { MovieDetails } from '@/types/movieDetails'
 import { resolveTrailerUrl } from '@/utils/formatMovie'
@@ -16,11 +16,11 @@ export const TrailerLink = ({ movie }: TrailerLinkProps) => {
       href={trailerUrl}
       target="_blank"
       rel="noopener noreferrer"
-      variant="outline"
-      className="w-fit border-border bg-card/80 backdrop-blur-sm hover:bg-muted"
+      variant="default"
+      className="w-fit"
     >
-      <ExternalLink data-icon="inline-start" />
-      Trailer on YouTube
+      <Play data-icon="inline-start" className="fill-current" />
+      Play trailer
     </LinkButton>
   )
 }
