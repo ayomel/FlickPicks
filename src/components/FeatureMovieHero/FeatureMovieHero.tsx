@@ -1,6 +1,7 @@
 import { useTrendingQuery } from '@/hooks/useTrendingQuery'
 import { useHeroSlideshow } from '@/hooks/useHeroSlideshow'
 import { hasBackdrop } from '@/types/trending'
+import { cn } from '@/lib/utils'
 import { HeroBackground } from './HeroBackground'
 import { HeroOverlay } from './HeroOverlay'
 import { HeroContent } from './HeroContent'
@@ -11,9 +12,17 @@ import { MovieDescription } from './MovieDescription'
 import { MovieActions } from './MovieActions'
 import { HeroControls } from './HeroControls'
 
+const heroHeightClass =
+  'h-[620px] min-h-[560px] sm:h-[min(78svh,760px)] sm:min-h-[560px]'
+
 const HeroFrame = ({ children }: { children: string }) => {
   return (
-    <section className="flex min-h-svh items-end bg-background px-6 pb-16 pt-16 text-sm text-muted-foreground sm:px-8 lg:px-10">
+    <section
+      className={cn(
+        'flex items-end bg-background px-6 pb-16 pt-16 text-sm text-muted-foreground sm:px-8 lg:px-10',
+        heroHeightClass,
+      )}
+    >
       <p className="m-0 font-mono text-xs">{children}</p>
     </section>
   )
@@ -48,7 +57,10 @@ export const FeatureMovieHero = () => {
 
   return (
     <section
-      className="relative min-h-svh overflow-hidden bg-background text-foreground"
+      className={cn(
+        'relative overflow-hidden bg-background text-foreground',
+        heroHeightClass,
+      )}
       onFocusCapture={() => setPaused(true)}
       onBlurCapture={(event) => {
         const nextFocus = event.relatedTarget
