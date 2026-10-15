@@ -68,7 +68,7 @@ export const HeroControls = ({
   }
 
   return (
-    <div className="absolute inset-x-0 bottom-0 z-20 px-6 pb-6 sm:px-8 sm:pb-8 lg:px-10">
+    <div className="absolute inset-x-0 bottom-0 z-20 px-6 pb-[calc(4.25rem+env(safe-area-inset-bottom))] sm:px-8 sm:pb-8 lg:px-10">
       <div className="flex items-center gap-3 sm:gap-4">
         <p
           className="m-0 shrink-0 font-mono text-xs tracking-[0.08em] text-muted-foreground tabular-nums"

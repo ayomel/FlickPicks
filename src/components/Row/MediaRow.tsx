@@ -53,6 +53,40 @@ const MediaRowSkeleton = ({ variant }: { variant: 'poster' | 'backdrop' }) => {
   )
 }
 
+type ArrowSlotProps = {
+  show: boolean
+  enabled: boolean
+  label: string
+  onPress: () => void
+  children: ReactNode
+}
+
+const ArrowSlot = ({
+  show,
+  enabled,
+  label,
+  onPress,
+  children,
+}: ArrowSlotProps) => {
+  if (!show) return null
+  if (!enabled) {
+    return <div className="hidden size-10 shrink-0 sm:block" aria-hidden />
+  }
+
+  return (
+    <Button
+      size="icon"
+      variant="secondary"
+      excludeFromTabOrder
+      aria-label={label}
+      className="hidden size-10 shrink-0 sm:inline-flex"
+      onPress={onPress}
+    >
+      {children}
+    </Button>
+  )
+}
+
 export function MediaRow<T>({
   label,
   title,
@@ -76,13 +110,16 @@ export function MediaRow<T>({
   const itemCount = items.length
   const isEmpty = !isLoading && !isError && itemCount === 0
   const skipId = `after-${label}-${title}`.toLowerCase().replace(/\s+/g, '-')
+  const hasOverflow = canScrollLeft || canScrollRight
 
   const updateScrollState = () => {
     const list = listRef.current
     if (!list) return
     const maxScroll = list.scrollWidth - list.clientWidth
-    setCanScrollLeft(list.scrollLeft > 1)
-    setCanScrollRight(maxScroll > 1 && list.scrollLeft < maxScroll - 1)
+    const nextLeft = list.scrollLeft > 1
+    const nextRight = maxScroll > 1 && list.scrollLeft < maxScroll - 1
+    setCanScrollLeft((prev) => (prev === nextLeft ? prev : nextLeft))
+    setCanScrollRight((prev) => (prev === nextRight ? prev : nextRight))
   }
 
   useEffect(() => {
@@ -111,7 +148,7 @@ export function MediaRow<T>({
   const focusItem = (index: number) => {
     if (itemCount === 0) return
     const nextIndex = Math.min(itemCount - 1, Math.max(0, index))
-    setActiveIndex(nextIndex)
+    setActiveIndex((prev) => (prev === nextIndex ? prev : nextIndex))
     const item = listRef.current?.querySelector(
       `[data-row-index="${nextIndex}"]`,
     )
@@ -179,25 +216,14 @@ export function MediaRow<T>({
               </a>
 
               <div className="flex items-center gap-2">
-                {canScrollLeft || canScrollRight ? (
-                  canScrollLeft ? (
-                    <Button
-                      size="icon"
-                      variant="secondary"
-                      excludeFromTabOrder
-                      aria-label={`Scroll ${title} left`}
-                      className="hidden size-10 shrink-0 sm:inline-flex"
-                      onPress={() => scrollByCards(-1)}
-                    >
-                      <ChevronLeft />
-                    </Button>
-                  ) : (
-                    <div
-                      className="hidden size-10 shrink-0 sm:block"
-                      aria-hidden
-                    />
-                  )
-                ) : null}
+                <ArrowSlot
+                  show={hasOverflow}
+                  enabled={canScrollLeft}
+                  label={`Scroll ${title} left`}
+                  onPress={() => scrollByCards(-1)}
+                >
+                  <ChevronLeft />
+                </ArrowSlot>
 
                 <ul
                   ref={listRef}
@@ -217,32 +243,24 @@ export function MediaRow<T>({
                     >
                       {renderItem(item, {
                         tabIndex: index === activeIndex ? 0 : -1,
-                        onFocus: () => setActiveIndex(index),
+                        onFocus: () =>
+                          setActiveIndex((prev) =>
+                            prev === index ? prev : index,
+                          ),
                         eager: index < eagerCount,
                       })}
                     </li>
                   ))}
                 </ul>
 
-                {canScrollLeft || canScrollRight ? (
-                  canScrollRight ? (
-                    <Button
-                      size="icon"
-                      variant="secondary"
-                      excludeFromTabOrder
-                      aria-label={`Scroll ${title} right`}
-                      className="hidden size-10 shrink-0 sm:inline-flex"
-                      onPress={() => scrollByCards(1)}
-                    >
-                      <ChevronRight />
-                    </Button>
-                  ) : (
-                    <div
-                      className="hidden size-10 shrink-0 sm:block"
-                      aria-hidden
-                    />
-                  )
-                ) : null}
+                <ArrowSlot
+                  show={hasOverflow}
+                  enabled={canScrollRight}
+                  label={`Scroll ${title} right`}
+                  onPress={() => scrollByCards(1)}
+                >
+                  <ChevronRight />
+                </ArrowSlot>
               </div>
 
               <div id={skipId} />

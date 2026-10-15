@@ -16,7 +16,6 @@ type PosterCardProps = {
   movie: PosterCardMovie
   tabIndex?: number
   onFocus?: FocusEventHandler<HTMLAnchorElement>
-  /** Prefer eager for the first visible cards in an above-the-fold row. */
   eager?: boolean
 }
 

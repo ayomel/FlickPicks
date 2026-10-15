@@ -34,13 +34,8 @@ export const ComingSoonRow = () => {
       isError={isError}
       emptyMessage="No upcoming titles right now."
       errorMessage="Couldn't load upcoming movies."
-      renderItem={(movie, { tabIndex, onFocus, eager }) => (
-        <BackdropCard
-          movie={movie}
-          tabIndex={tabIndex}
-          onFocus={onFocus}
-          eager={eager}
-        />
+      renderItem={(movie, { tabIndex, onFocus }) => (
+        <BackdropCard movie={movie} tabIndex={tabIndex} onFocus={onFocus} />
       )}
     />
   )

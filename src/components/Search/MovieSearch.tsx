@@ -7,16 +7,19 @@ import { SearchDropdown, SearchDropdownMessage } from './SearchDropdown'
 import { SearchInput } from './SearchInput'
 import { SearchResultRow } from './SearchResultRow'
 
-const LISTBOX_ID = 'movie-search-listbox'
+type MovieSearchProps = {
+  autoFocus?: boolean
+}
 
-export const MovieSearch = () => {
+export const MovieSearch = ({ autoFocus = false }: MovieSearchProps) => {
   const navigate = useNavigate()
   const rootRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
   const instanceId = useId()
+  const listboxId = `movie-search-listbox-${instanceId}`
 
   const [query, setQuery] = useState('')
-  const [open, setOpen] = useState(false)
+  const [open, setOpen] = useState(autoFocus)
   const [activeIndex, setActiveIndex] = useState(0)
 
   const debouncedQuery = useDebouncedValue(query, 300)
@@ -45,6 +48,11 @@ export const MovieSearch = () => {
     setIndexedResultsKey(resultsKey)
     setActiveIndex(0)
   }
+
+  useEffect(() => {
+    if (!autoFocus) return
+    inputRef.current?.focus()
+  }, [autoFocus])
 
   useEffect(() => {
     const handlePointerDown = (event: MouseEvent) => {
@@ -109,12 +117,12 @@ export const MovieSearch = () => {
         onChange={setQuery}
         onFocus={() => setOpen(true)}
         onKeyDown={handleInputKeyDown}
-        listboxId={LISTBOX_ID}
+        listboxId={listboxId}
         isExpanded={showDropdown}
         activeOptionId={activeOptionId}
       />
 
-      <SearchDropdown listboxId={LISTBOX_ID} isOpen={showDropdown}>
+      <SearchDropdown listboxId={listboxId} isOpen={showDropdown}>
         {isLoading ? (
           <SearchDropdownMessage>Searching…</SearchDropdownMessage>
         ) : isError ? (
