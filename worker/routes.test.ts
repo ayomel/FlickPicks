@@ -1,29 +1,28 @@
-import assert from 'node:assert/strict'
-import { describe, it } from 'node:test'
-import { isAppShellPath, isStaticAssetPath } from './routes.ts'
+import { describe, expect, it } from 'vitest'
+import { isAppShellPath, isStaticAssetPath } from './routes'
 
 describe('isAppShellPath', () => {
   it('allows home and numeric movie routes', () => {
-    assert.equal(isAppShellPath('/'), true)
-    assert.equal(isAppShellPath('/movies/550'), true)
-    assert.equal(isAppShellPath('/movies/0'), true)
+    expect(isAppShellPath('/')).toBe(true)
+    expect(isAppShellPath('/movies/550')).toBe(true)
+    expect(isAppShellPath('/movies/0')).toBe(true)
   })
 
   it('rejects unknown or non-numeric movie paths', () => {
-    assert.equal(isAppShellPath('/nope'), false)
-    assert.equal(isAppShellPath('/movies'), false)
-    assert.equal(isAppShellPath('/movies/'), false)
-    assert.equal(isAppShellPath('/movies/abc'), false)
-    assert.equal(isAppShellPath('/movies/55a'), false)
-    assert.equal(isAppShellPath('/movies/550/extra'), false)
+    expect(isAppShellPath('/nope')).toBe(false)
+    expect(isAppShellPath('/movies')).toBe(false)
+    expect(isAppShellPath('/movies/')).toBe(false)
+    expect(isAppShellPath('/movies/abc')).toBe(false)
+    expect(isAppShellPath('/movies/55a')).toBe(false)
+    expect(isAppShellPath('/movies/550/extra')).toBe(false)
   })
 })
 
 describe('isStaticAssetPath', () => {
   it('detects extensioned assets and skips html', () => {
-    assert.equal(isStaticAssetPath('/assets/index-abc.js'), true)
-    assert.equal(isStaticAssetPath('/favicon.svg'), true)
-    assert.equal(isStaticAssetPath('/index.html'), false)
-    assert.equal(isStaticAssetPath('/movies/550'), false)
+    expect(isStaticAssetPath('/assets/index-abc.js')).toBe(true)
+    expect(isStaticAssetPath('/favicon.svg')).toBe(true)
+    expect(isStaticAssetPath('/index.html')).toBe(false)
+    expect(isStaticAssetPath('/movies/550')).toBe(false)
   })
 })

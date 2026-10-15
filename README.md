@@ -18,7 +18,6 @@ Set `VITE_API_URL` to `https://flickpicks.fastapicloud.dev/` (see `.env`).
 pnpm lint
 pnpm typecheck
 pnpm test
-pnpm test:worker
 pnpm build
 pnpm preview
 ```
