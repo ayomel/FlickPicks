@@ -42,7 +42,7 @@ const MediaRowSkeleton = ({ variant }: { variant: 'poster' | 'backdrop' }) => {
   const aspectClass = variant === 'backdrop' ? 'aspect-video' : 'aspect-[2/3]'
 
   return (
-    <div className="flex gap-3 overflow-hidden px-6 py-2 sm:px-12">
+    <div className="flex gap-3 overflow-hidden px-6 py-2 sm:px-8 lg:px-10">
       {Array.from({ length: 5 }, (_, index) => (
         <div key={index} className={cardClass}>
           <Skeleton className={cn(aspectClass, 'w-full rounded-md')} />
@@ -189,7 +189,7 @@ export function MediaRow<T>({
   return (
     <section className={cn('relative z-10 py-8', className)}>
       {showHeading ? (
-        <div className="px-6 sm:px-12">
+        <div className="px-6 sm:px-8 lg:px-10">
           <SectionLabel className="mb-2">{label}</SectionLabel>
           <h2 className="mb-5 text-xl font-semibold tracking-tight text-foreground">
             {title}
@@ -200,11 +200,11 @@ export function MediaRow<T>({
       {isLoading ? (
         <MediaRowSkeleton variant={variant} />
       ) : isError ? (
-        <p className="m-0 px-6 text-sm text-muted-foreground sm:px-12">
+        <p className="m-0 px-6 text-sm text-muted-foreground sm:px-8 lg:px-10">
           {errorMessage}
         </p>
       ) : isEmpty ? (
-        <p className="m-0 px-6 text-sm text-muted-foreground sm:px-12">
+        <p className="m-0 px-6 text-sm text-muted-foreground sm:px-8 lg:px-10">
           {emptyMessage}
         </p>
       ) : (
@@ -232,7 +232,7 @@ export function MediaRow<T>({
               className={cn(
                 'm-0 flex w-full list-none gap-3 overflow-x-auto py-3',
                 'snap-x snap-mandatory scroll-smooth [scrollbar-width:thin]',
-                'px-6 scroll-px-6 sm:px-12 sm:scroll-px-12',
+                'px-6 scroll-px-6 sm:px-8 sm:scroll-px-8 lg:px-10 lg:scroll-px-10',
               )}
               onKeyDown={onListKeyDown}
             >
@@ -266,7 +266,7 @@ export function MediaRow<T>({
         </>
       )}
 
-      {footer ? <div className="px-6 sm:px-12">{footer}</div> : null}
+      {footer ? <div className="px-6 sm:px-8 lg:px-10">{footer}</div> : null}
     </section>
   )
 }

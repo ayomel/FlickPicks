@@ -38,7 +38,9 @@ export const FeatureMovieHero = () => {
     next,
     prev,
     goTo,
-    setPaused,
+    setContentHovered,
+    setControlsHovered,
+    setFocused,
     reducedMotion,
   } = useHeroSlideshow(movies.length)
   const movie = movies[index]
@@ -61,14 +63,14 @@ export const FeatureMovieHero = () => {
         'relative overflow-hidden bg-background text-foreground',
         heroHeightClass,
       )}
-      onFocusCapture={() => setPaused(true)}
+      onFocusCapture={() => setFocused(true)}
       onBlurCapture={(event) => {
         const nextFocus = event.relatedTarget
         if (
           !(nextFocus instanceof Node) ||
           !event.currentTarget.contains(nextFocus)
         ) {
-          setPaused(false)
+          setFocused(false)
         }
       }}
     >
@@ -78,8 +80,8 @@ export const FeatureMovieHero = () => {
       />
       <HeroOverlay />
       <div
-        onMouseEnter={() => setPaused(true)}
-        onMouseLeave={() => setPaused(false)}
+        onMouseEnter={() => setContentHovered(true)}
+        onMouseLeave={() => setContentHovered(false)}
       >
         <HeroContent>
           <HeroRankTag rank={index + 1} />
@@ -90,8 +92,8 @@ export const FeatureMovieHero = () => {
         </HeroContent>
       </div>
       <div
-        onMouseEnter={() => setPaused(true)}
-        onMouseLeave={() => setPaused(false)}
+        onMouseEnter={() => setControlsHovered(true)}
+        onMouseLeave={() => setControlsHovered(false)}
       >
         <HeroControls
           index={index}

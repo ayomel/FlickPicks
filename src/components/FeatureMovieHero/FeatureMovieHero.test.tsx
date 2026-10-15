@@ -5,7 +5,9 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import { FeatureMovieHero } from './FeatureMovieHero'
 import type { FeaturedMovie } from '@/types/trending'
 
-const setPaused = vi.fn()
+const setContentHovered = vi.fn()
+const setControlsHovered = vi.fn()
+const setFocused = vi.fn()
 
 vi.mock('@/hooks/useHeroSlideshow', () => ({
   useHeroSlideshow: () => ({
@@ -15,7 +17,9 @@ vi.mock('@/hooks/useHeroSlideshow', () => ({
     next: vi.fn(),
     prev: vi.fn(),
     goTo: vi.fn(),
-    setPaused,
+    setContentHovered,
+    setControlsHovered,
+    setFocused,
     reducedMotion: false,
   }),
   HERO_INTERVAL_MS: 6000,
@@ -93,7 +97,9 @@ vi.mock('@/hooks/useRemoveFromWatchlistMutation', () => ({
 
 afterEach(() => {
   cleanup()
-  setPaused.mockClear()
+  setContentHovered.mockClear()
+  setControlsHovered.mockClear()
+  setFocused.mockClear()
 })
 
 const renderHero = () => {
@@ -114,23 +120,44 @@ describe('FeatureMovieHero', () => {
     expect(section).toBeTruthy()
 
     fireEvent.mouseEnter(section!)
-    expect(setPaused).not.toHaveBeenCalled()
+    expect(setContentHovered).not.toHaveBeenCalled()
+    expect(setControlsHovered).not.toHaveBeenCalled()
 
     const contentRoot = screen
       .getByRole('heading', { name: 'Fight Club' })
       .closest('.absolute')
     fireEvent.mouseEnter(contentRoot!.parentElement!)
-    expect(setPaused).toHaveBeenCalledWith(true)
+    expect(setContentHovered).toHaveBeenCalledWith(true)
 
-    setPaused.mockClear()
+    setContentHovered.mockClear()
     const controlsRoot = screen
       .getByRole('button', { name: 'Next movie' })
       .closest('.absolute')
     fireEvent.mouseEnter(controlsRoot!.parentElement!)
-    expect(setPaused).toHaveBeenCalledWith(true)
+    expect(setControlsHovered).toHaveBeenCalledWith(true)
 
-    setPaused.mockClear()
+    setFocused.mockClear()
     fireEvent.focus(screen.getByRole('button', { name: 'Next movie' }))
-    expect(setPaused).toHaveBeenCalledWith(true)
+    expect(setFocused).toHaveBeenCalledWith(true)
+  })
+
+  it('keeps hover flags independent when moving from content to controls', () => {
+    renderHero()
+
+    const contentRoot = screen
+      .getByRole('heading', { name: 'Fight Club' })
+      .closest('.absolute')
+    const contentHotzone = contentRoot!.parentElement!
+    const controlsHotzone = screen
+      .getByRole('button', { name: 'Next movie' })
+      .closest('.absolute')!.parentElement!
+
+    fireEvent.mouseEnter(contentHotzone)
+    expect(setContentHovered).toHaveBeenCalledWith(true)
+
+    fireEvent.mouseLeave(contentHotzone)
+    fireEvent.mouseEnter(controlsHotzone)
+    expect(setContentHovered).toHaveBeenCalledWith(false)
+    expect(setControlsHovered).toHaveBeenCalledWith(true)
   })
 })

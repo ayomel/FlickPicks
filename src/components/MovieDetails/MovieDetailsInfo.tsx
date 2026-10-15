@@ -111,7 +111,7 @@ export const MovieDetailsInfo = ({ movie }: MovieDetailsInfoProps) => {
   return (
     <aside className="flex flex-col gap-6">
       <div className="grid grid-cols-[110px_1fr] gap-4 rounded-lg bg-card p-5 lg:hidden">
-        <div className="overflow-hidden rounded-md border border-border bg-muted">
+        <div className="self-start overflow-hidden rounded-md border border-border bg-muted">
           {renderPoster('lazy')}
         </div>
         <div className="flex min-w-0 flex-col gap-4">

@@ -22,18 +22,30 @@ const wrapIndex = (value: number, length: number) =>
 
 export const useHeroSlideshow = (length: number) => {
   const [rawIndex, setRawIndex] = useState(0)
-  const [paused, setPausedState] = useState(false)
+  const [contentHovered, setContentHovered] = useState(false)
+  const [controlsHovered, setControlsHovered] = useState(false)
+  const [focused, setFocused] = useState(false)
   const [progress, setProgress] = useState(0)
   const [progressRawIndex, setProgressRawIndex] = useState(0)
   const animStartedAtRef = useRef<number | null>(null)
+  const wasPausedRef = useRef(false)
   const reducedMotion = usePrefersReducedMotion()
   const index = wrapIndex(rawIndex, length)
+  const paused = contentHovered || controlsHovered || focused
   const playing = length > 1 && !paused && !reducedMotion
 
   if (progressRawIndex !== rawIndex) {
     setProgressRawIndex(rawIndex)
     setProgress(0)
   }
+
+  useEffect(() => {
+    if (paused && !wasPausedRef.current && animStartedAtRef.current != null) {
+      const elapsed = performance.now() - animStartedAtRef.current
+      setProgress(Math.min(1, Math.max(0, elapsed / HERO_INTERVAL_MS)))
+    }
+    wasPausedRef.current = paused
+  }, [paused])
 
   useEffect(() => {
     if (!playing) {
@@ -58,17 +70,6 @@ export const useHeroSlideshow = (length: number) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps -- freeze/resume samples progress once
   }, [playing, rawIndex, length])
 
-  const setPaused = (nextPaused: boolean) => {
-    if (nextPaused === paused) return
-
-    if (nextPaused && animStartedAtRef.current != null) {
-      const elapsed = performance.now() - animStartedAtRef.current
-      setProgress(Math.min(1, Math.max(0, elapsed / HERO_INTERVAL_MS)))
-    }
-
-    setPausedState(nextPaused)
-  }
-
   const goTo = (nextIndex: number) => {
     if (length === 0) return
     setRawIndex(nextIndex)
@@ -91,7 +92,9 @@ export const useHeroSlideshow = (length: number) => {
     next,
     prev,
     goTo,
-    setPaused,
+    setContentHovered,
+    setControlsHovered,
+    setFocused,
     reducedMotion,
   }
 }

@@ -50,7 +50,7 @@ describe('useHeroSlideshow', () => {
 
     act(() => {
       vi.advanceTimersByTime(2000)
-      result.current.setPaused(true)
+      result.current.setContentHovered(true)
     })
 
     expect(result.current.progress).toBeGreaterThan(0.2)
@@ -58,7 +58,7 @@ describe('useHeroSlideshow', () => {
     expect(result.current.playing).toBe(false)
 
     act(() => {
-      result.current.setPaused(false)
+      result.current.setContentHovered(false)
     })
 
     const remaining = HERO_INTERVAL_MS * (1 - result.current.progress)
@@ -71,5 +71,25 @@ describe('useHeroSlideshow', () => {
       vi.advanceTimersByTime(100)
     })
     expect(result.current.index).toBe(1)
+  })
+
+  it('stays paused when leaving content and entering controls in the same batch', () => {
+    const { result } = renderHook(() => useHeroSlideshow(3))
+
+    act(() => {
+      result.current.setContentHovered(true)
+    })
+    expect(result.current.playing).toBe(false)
+
+    act(() => {
+      result.current.setContentHovered(false)
+      result.current.setControlsHovered(true)
+    })
+    expect(result.current.playing).toBe(false)
+
+    act(() => {
+      result.current.setControlsHovered(false)
+    })
+    expect(result.current.playing).toBe(true)
   })
 })

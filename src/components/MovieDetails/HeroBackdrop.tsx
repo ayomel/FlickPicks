@@ -27,18 +27,24 @@ export const HeroBackdrop = ({
   }
 
   return (
-    <img
-      src={src}
-      srcSet={backdropPath ? getBackdropSrcSet(backdropPath) : undefined}
-      sizes={backdropPath ? BACKDROP_SIZES_HERO : undefined}
-      alt=""
-      width={BACKDROP_WIDTH}
-      height={BACKDROP_HEIGHT}
-      loading="eager"
-      decoding="async"
-      fetchPriority="high"
-      onError={() => setImageFailed(true)}
-      className="absolute inset-0 size-full object-cover"
-    />
+    <div className="absolute inset-0">
+      <img
+        src={src}
+        srcSet={backdropPath ? getBackdropSrcSet(backdropPath) : undefined}
+        sizes={backdropPath ? BACKDROP_SIZES_HERO : undefined}
+        alt=""
+        width={BACKDROP_WIDTH}
+        height={BACKDROP_HEIGHT}
+        loading="eager"
+        decoding="async"
+        fetchPriority="high"
+        onError={() => setImageFailed(true)}
+        className="absolute inset-0 size-full object-cover"
+      />
+      <div
+        className="absolute inset-y-0 left-0 w-[min(100%,42rem)] bg-linear-to-r from-background/75 via-background/35 to-transparent"
+        aria-hidden
+      />
+    </div>
   )
 }
