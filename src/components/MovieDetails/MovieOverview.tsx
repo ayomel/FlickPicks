@@ -11,7 +11,7 @@ export const MovieOverview = ({ overview }: MovieOverviewProps) => {
   return (
     <PageSection>
       <SectionLabel className="mb-3">Overview</SectionLabel>
-      <p className="m-0 max-w-3xl text-sm leading-relaxed text-muted-foreground">
+      <p className="m-0 max-w-3xl text-base leading-relaxed text-muted-foreground sm:text-lg">
         {overview}
       </p>
     </PageSection>

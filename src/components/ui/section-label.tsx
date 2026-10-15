@@ -10,7 +10,7 @@ export const SectionLabel = ({ children, className }: SectionLabelProps) => {
   return (
     <p
       className={cn(
-        'm-0 font-mono text-[11px] font-semibold tracking-[0.08em] text-brand uppercase',
+        'm-0 font-mono text-xs font-semibold tracking-[0.08em] text-brand uppercase',
         className,
       )}
     >
