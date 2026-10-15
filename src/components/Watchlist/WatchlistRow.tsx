@@ -25,7 +25,7 @@ export const WatchlistRow = () => {
   }
 
   return (
-    <section className="relative z-10 -mt-20 pb-16 sm:-mt-28">
+    <section className="relative z-10 pb-16 pt-8">
       <div className="px-6 sm:px-8 lg:px-10">
         <div className="mx-auto max-w-6xl">
           <SectionLabel className="mb-2">Your watchlist</SectionLabel>

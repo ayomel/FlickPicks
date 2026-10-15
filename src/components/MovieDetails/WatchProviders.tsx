@@ -18,7 +18,7 @@ const ProviderGroup = ({
 
   return (
     <div className="flex flex-col gap-3">
-      <h3 className="m-0 font-mono text-[11px] font-semibold tracking-[0.08em] text-muted-foreground uppercase">
+      <h3 className="m-0 font-mono text-xs font-semibold tracking-[0.08em] text-muted-foreground uppercase">
         {label}
       </h3>
       <ul className="m-0 flex list-none flex-wrap gap-2 p-0">
