@@ -1,0 +1,21 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  // Live Worker script id on mel-2cb.workers.dev (dashboard Git integration).
+  "name": "flickpick",
+  "main": "./worker/index.ts",
+  // Matches the live Worker compatibility_date from the Cloudflare API.
+  "compatibility_date": "2026-10-12",
+  "assets": {
+    // Vite build output. Same directory the Git integration already publishes.
+    "directory": "./dist",
+    "binding": "ASSETS",
+    // Same SPA fallback the live Worker uses today (confirmed via Workers versions API).
+    "not_found_handling": "single-page-application",
+    // Needed so the Worker can set HTTP 404 while still serving the shell.
+    // Hashed Vite assets stay asset-first for caching.
+    "run_worker_first": ["/*", "!/assets/*"],
+  },
+  "observability": {
+    "enabled": true,
+  },
+}
