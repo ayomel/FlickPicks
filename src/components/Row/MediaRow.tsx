@@ -42,7 +42,7 @@ const MediaRowSkeleton = ({ variant }: { variant: 'poster' | 'backdrop' }) => {
   const aspectClass = variant === 'backdrop' ? 'aspect-video' : 'aspect-[2/3]'
 
   return (
-    <div className="flex gap-3 overflow-hidden py-2">
+    <div className="flex gap-3 overflow-hidden px-6 py-2 sm:px-12">
       {Array.from({ length: 5 }, (_, index) => (
         <div key={index} className={cardClass}>
           <Skeleton className={cn(aspectClass, 'w-full rounded-md')} />
@@ -55,23 +55,20 @@ const MediaRowSkeleton = ({ variant }: { variant: 'poster' | 'backdrop' }) => {
 
 type ArrowSlotProps = {
   show: boolean
-  enabled: boolean
   label: string
   onPress: () => void
+  side: 'left' | 'right'
   children: ReactNode
 }
 
 const ArrowSlot = ({
   show,
-  enabled,
   label,
   onPress,
+  side,
   children,
 }: ArrowSlotProps) => {
   if (!show) return null
-  if (!enabled) {
-    return <div className="hidden size-10 shrink-0 sm:block" aria-hidden />
-  }
 
   return (
     <Button
@@ -79,7 +76,10 @@ const ArrowSlot = ({
       variant="secondary"
       excludeFromTabOrder
       aria-label={label}
-      className="hidden size-10 shrink-0 sm:inline-flex"
+      className={cn(
+        'absolute top-1/2 z-10 hidden size-10 -translate-y-1/2 sm:inline-flex',
+        side === 'left' ? 'left-2' : 'right-2',
+      )}
       onPress={onPress}
     >
       {children}
@@ -110,7 +110,6 @@ export function MediaRow<T>({
   const itemCount = items.length
   const isEmpty = !isLoading && !isError && itemCount === 0
   const skipId = `after-${label}-${title}`.toLowerCase().replace(/\s+/g, '-')
-  const hasOverflow = canScrollLeft || canScrollRight
 
   const updateScrollState = () => {
     const list = listRef.current
@@ -189,87 +188,85 @@ export function MediaRow<T>({
 
   return (
     <section className={cn('relative z-10 py-8', className)}>
-      <div className="px-6 sm:px-8 lg:px-10">
-        <div className="mx-auto max-w-6xl">
-          {showHeading ? (
-            <>
-              <SectionLabel className="mb-2">{label}</SectionLabel>
-              <h2 className="mb-5 text-xl font-semibold tracking-tight text-foreground">
-                {title}
-              </h2>
-            </>
-          ) : null}
-
-          {isLoading ? (
-            <MediaRowSkeleton variant={variant} />
-          ) : isError ? (
-            <p className="m-0 text-sm text-muted-foreground">{errorMessage}</p>
-          ) : isEmpty ? (
-            <p className="m-0 text-sm text-muted-foreground">{emptyMessage}</p>
-          ) : (
-            <>
-              <a
-                href={`#${skipId}`}
-                className="sr-only focus:not-sr-only focus:absolute focus:z-30 focus:rounded-md focus:bg-background focus:px-3 focus:py-2 focus:text-sm focus:text-foreground focus:ring-2 focus:ring-foreground/70"
-              >
-                Skip {title}
-              </a>
-
-              <div className="flex items-center gap-2">
-                <ArrowSlot
-                  show={hasOverflow}
-                  enabled={canScrollLeft}
-                  label={`Scroll ${title} left`}
-                  onPress={() => scrollByCards(-1)}
-                >
-                  <ChevronLeft />
-                </ArrowSlot>
-
-                <ul
-                  ref={listRef}
-                  aria-label={title}
-                  className={cn(
-                    'm-0 flex min-w-0 flex-1 list-none gap-3 overflow-x-auto py-3',
-                    'snap-x snap-mandatory scroll-smooth [scrollbar-width:thin]',
-                    'px-1 scroll-px-1 sm:scroll-px-12',
-                  )}
-                  onKeyDown={onListKeyDown}
-                >
-                  {items.map((item, index) => (
-                    <li
-                      key={getKey(item)}
-                      data-row-index={index}
-                      className="contents"
-                    >
-                      {renderItem(item, {
-                        tabIndex: index === activeIndex ? 0 : -1,
-                        onFocus: () =>
-                          setActiveIndex((prev) =>
-                            prev === index ? prev : index,
-                          ),
-                        eager: index < eagerCount,
-                      })}
-                    </li>
-                  ))}
-                </ul>
-
-                <ArrowSlot
-                  show={hasOverflow}
-                  enabled={canScrollRight}
-                  label={`Scroll ${title} right`}
-                  onPress={() => scrollByCards(1)}
-                >
-                  <ChevronRight />
-                </ArrowSlot>
-              </div>
-
-              <div id={skipId} />
-            </>
-          )}
-
-          {footer}
+      {showHeading ? (
+        <div className="px-6 sm:px-12">
+          <SectionLabel className="mb-2">{label}</SectionLabel>
+          <h2 className="mb-5 text-xl font-semibold tracking-tight text-foreground">
+            {title}
+          </h2>
         </div>
-      </div>
+      ) : null}
+
+      {isLoading ? (
+        <MediaRowSkeleton variant={variant} />
+      ) : isError ? (
+        <p className="m-0 px-6 text-sm text-muted-foreground sm:px-12">
+          {errorMessage}
+        </p>
+      ) : isEmpty ? (
+        <p className="m-0 px-6 text-sm text-muted-foreground sm:px-12">
+          {emptyMessage}
+        </p>
+      ) : (
+        <>
+          <a
+            href={`#${skipId}`}
+            className="sr-only focus:not-sr-only focus:absolute focus:z-30 focus:rounded-md focus:bg-background focus:px-3 focus:py-2 focus:text-sm focus:text-foreground focus:ring-2 focus:ring-foreground/70"
+          >
+            Skip {title}
+          </a>
+
+          <div className="relative">
+            <ArrowSlot
+              show={canScrollLeft}
+              label={`Scroll ${title} left`}
+              side="left"
+              onPress={() => scrollByCards(-1)}
+            >
+              <ChevronLeft />
+            </ArrowSlot>
+
+            <ul
+              ref={listRef}
+              aria-label={title}
+              className={cn(
+                'm-0 flex w-full list-none gap-3 overflow-x-auto py-3',
+                'snap-x snap-mandatory scroll-smooth [scrollbar-width:thin]',
+                'px-6 scroll-px-6 sm:px-12 sm:scroll-px-12',
+              )}
+              onKeyDown={onListKeyDown}
+            >
+              {items.map((item, index) => (
+                <li
+                  key={getKey(item)}
+                  data-row-index={index}
+                  className="contents"
+                >
+                  {renderItem(item, {
+                    tabIndex: index === activeIndex ? 0 : -1,
+                    onFocus: () =>
+                      setActiveIndex((prev) => (prev === index ? prev : index)),
+                    eager: index < eagerCount,
+                  })}
+                </li>
+              ))}
+            </ul>
+
+            <ArrowSlot
+              show={canScrollRight}
+              label={`Scroll ${title} right`}
+              side="right"
+              onPress={() => scrollByCards(1)}
+            >
+              <ChevronRight />
+            </ArrowSlot>
+          </div>
+
+          <div id={skipId} />
+        </>
+      )}
+
+      {footer ? <div className="px-6 sm:px-12">{footer}</div> : null}
     </section>
   )
 }
