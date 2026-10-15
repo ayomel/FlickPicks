@@ -1,5 +1,5 @@
 import type { MovieDetails } from '@/types/movieDetails'
-import { getBackdropPath } from '@/utils/getPosterPath'
+import { getBackdropPath, getPosterPath } from '@/utils/getPosterPath'
 
 export const formatRuntime = (minutes: number) => {
   if (!minutes || minutes <= 0) return null
@@ -91,4 +91,39 @@ export const getStudioNames = (movie: MovieDetails) => {
   const names = movie.production_companies?.map((c) => c.name).filter(Boolean)
   if (!names?.length) return null
   return names.join(', ')
+}
+
+export const getCountryNames = (movie: MovieDetails) => {
+  const names = movie.production_countries?.map((c) => c.name).filter(Boolean)
+  if (!names?.length) return null
+  return names.join(', ')
+}
+
+export const formatBudget = (budget: number) => {
+  if (!budget || budget <= 0) return null
+  if (budget >= 1_000_000_000) {
+    const billions = budget / 1_000_000_000
+    const formatted = Number.isInteger(billions)
+      ? String(billions)
+      : billions.toFixed(1).replace(/\.0$/, '')
+    return `$${formatted}B`
+  }
+  if (budget >= 1_000_000) {
+    const millions = budget / 1_000_000
+    const formatted = Number.isInteger(millions)
+      ? String(millions)
+      : millions.toFixed(1).replace(/\.0$/, '')
+    return `$${formatted}M`
+  }
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+    maximumFractionDigits: 0,
+  }).format(budget)
+}
+
+export const resolvePosterUrl = (movie: MovieDetails) => {
+  if (movie.poster?.startsWith('http')) return movie.poster
+  if (movie.poster_path) return getPosterPath(movie.poster_path)
+  return null
 }

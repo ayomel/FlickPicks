@@ -80,20 +80,24 @@ describe('MobileTabBar', () => {
     expect(searchTab).toHaveFocus()
   })
 
-  it('closes the search panel on a tap outside it', async () => {
+  it('closes the search panel on a tap outside without restoring focus', async () => {
     const user = userEvent.setup()
     renderBar()
 
-    await user.click(screen.getByRole('button', { name: 'Search' }))
+    const searchTab = screen.getByRole('button', { name: 'Search' })
+    await user.click(searchTab)
     expect(
       screen.getByRole('dialog', { name: 'Search movies' }),
     ).toBeInTheDocument()
 
-    await user.click(screen.getByRole('button', { name: 'Outside' }))
+    const outside = screen.getByRole('button', { name: 'Outside' })
+    await user.click(outside)
 
     expect(
       screen.queryByRole('dialog', { name: 'Search movies' }),
     ).not.toBeInTheDocument()
+    expect(searchTab).not.toHaveFocus()
+    expect(outside).toHaveFocus()
   })
 
   it('marks Home as the current page on /', () => {

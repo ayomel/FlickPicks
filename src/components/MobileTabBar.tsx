@@ -53,7 +53,7 @@ export const MobileTabBar = () => {
       const target = event.target
       if (!(target instanceof Node)) return
       if (shellRef.current?.contains(target)) return
-      closeSearch(true)
+      closeSearch()
     }
 
     document.addEventListener('keydown', onKeyDown)
