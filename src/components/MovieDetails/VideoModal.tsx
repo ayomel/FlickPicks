@@ -45,7 +45,6 @@ export const VideoModal = ({
           'exiting:animate-out exiting:zoom-out-95 exiting:duration-100',
         )}
       >
-        {/* React Aria Dialog omits aria-modal (Safari bug); ModalOverlay still traps focus. */}
         <Dialog aria-label={title} className="outline-none">
           {({ close }) => (
             <div className="overflow-hidden rounded-lg border border-border bg-card shadow-lg">

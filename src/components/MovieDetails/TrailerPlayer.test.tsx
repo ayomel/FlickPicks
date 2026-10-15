@@ -33,9 +33,7 @@ describe('TrailerPlayer', () => {
       'referrerPolicy',
       'strict-origin-when-cross-origin',
     )
-    expect(
-      screen.getByText('Press Esc or Close to exit'),
-    ).toBeInTheDocument()
+    expect(screen.getByText('Press Esc or Close to exit')).toBeInTheDocument()
     expect(screen.getByRole('dialog')).toBeInTheDocument()
   })
 

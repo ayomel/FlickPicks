@@ -7,10 +7,7 @@ type MoreTrendingRowProps = {
   excludeId: number
 }
 
-const renderPoster = (
-  movie: TrendingMovie,
-  options: MediaRowItemOptions,
-) => (
+const renderPoster = (movie: TrendingMovie, options: MediaRowItemOptions) => (
   <PosterCard
     movie={movie}
     tabIndex={options.tabIndex}

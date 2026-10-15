@@ -79,9 +79,11 @@ describe('VideosRow', () => {
     fireEvent.error(screen.getByRole('presentation'))
     expect(screen.queryByRole('presentation')).not.toBeInTheDocument()
     expect(
-      screen.getByRole('button', {
-        name: 'Play Official Trailer, Trailer, Official',
-      }).querySelector('svg'),
+      screen
+        .getByRole('button', {
+          name: 'Play Official Trailer, Trailer, Official',
+        })
+        .querySelector('svg'),
     ).toBeTruthy()
   })
 })

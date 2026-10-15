@@ -52,9 +52,7 @@ describe('WatchProviders', () => {
     expect(
       screen.getByRole('heading', { level: 3, name: 'Buy' }),
     ).toBeInTheDocument()
-    expect(
-      screen.getByRole('link', { name: 'JustWatch' }),
-    ).toHaveAttribute(
+    expect(screen.getByRole('link', { name: 'JustWatch' })).toHaveAttribute(
       'href',
       'https://www.themoviedb.org/movie/603/watch?locale=US',
     )
