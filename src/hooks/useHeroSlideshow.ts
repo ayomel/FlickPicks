@@ -47,15 +47,15 @@ export const useHeroSlideshow = (length: number) => {
     const remaining = Math.max(0, HERO_INTERVAL_MS * (1 - progress))
 
     const timer = window.setTimeout(() => {
-      setProgress(0)
       setRawIndex((current) => current + 1)
     }, remaining)
 
     return () => {
       window.clearTimeout(timer)
     }
-    // progress is sampled when playback starts or resumes, not tracked per frame
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- intentional freeze/resume
+    // Omit `progress` on purpose: include it and every resume would restart the
+    // timeout from a new closure while the CSS animation keeps the frozen offset.
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- freeze/resume samples progress once
   }, [playing, rawIndex, length])
 
   const setPaused = (nextPaused: boolean) => {

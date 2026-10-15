@@ -29,9 +29,13 @@ export const HeroControls = ({
   const [liveText, setLiveText] = useState('')
 
   useEffect(() => {
-    if (!userNavRef.current) return
-    setLiveText(`${padSlide(index + 1)} / ${padSlide(count)}`)
-    userNavRef.current = false
+    if (userNavRef.current) {
+      setLiveText(`${padSlide(index + 1)} / ${padSlide(count)}`)
+      userNavRef.current = false
+      return
+    }
+    // Autoplay advanced the slide; clear so SR does not re-announce.
+    setLiveText('')
   }, [index, count])
 
   if (count <= 1) return null
@@ -79,7 +83,7 @@ export const HeroControls = ({
         </p>
 
         <div
-          className="flex min-w-0 flex-1 items-center gap-1 outline-none focus-visible:ring-2 focus-visible:ring-foreground/70 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+          className="hidden min-w-0 flex-1 items-center gap-1 outline-none focus-visible:ring-2 focus-visible:ring-foreground/70 focus-visible:ring-offset-2 focus-visible:ring-offset-background sm:flex"
           role="group"
           aria-label="Featured movies"
           tabIndex={0}

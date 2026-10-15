@@ -1,11 +1,15 @@
 import FeatureMovieHero from '../components/FeatureMovieHero/FeatureMovieHero'
+import { TrendingRows } from '@/components/Row/TrendingRows'
 import { WatchlistRow } from '@/components/Watchlist/WatchlistRow'
 
 export const Home = () => {
   return (
     <div className="min-h-svh bg-background">
       <FeatureMovieHero />
-      <WatchlistRow />
+      <div className="relative z-10 pb-16">
+        <TrendingRows />
+        <WatchlistRow />
+      </div>
     </div>
   )
 }

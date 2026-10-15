@@ -95,6 +95,22 @@ describe('HeroControls', () => {
     expect(
       screen.getByText('02 / 05', { selector: '[aria-live="polite"]' }),
     ).toBeInTheDocument()
+
+    rerender(
+      <HeroControls
+        index={2}
+        count={5}
+        progress={0}
+        playing
+        onPrev={vi.fn()}
+        onNext={vi.fn()}
+        onGoTo={vi.fn()}
+      />,
+    )
+
+    expect(
+      screen.getByText('', { selector: '[aria-live="polite"]' }),
+    ).toHaveTextContent('')
   })
 
   it('hides when there is only one slide', () => {
