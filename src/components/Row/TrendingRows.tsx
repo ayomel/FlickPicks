@@ -9,6 +9,33 @@ import {
 
 export const TrendingRows = () => {
   const { data, isLoading, isError } = useTrendingQuery()
+
+  if (isLoading) {
+    return (
+      <MediaRow
+        label="Trending"
+        title="Popular this week"
+        isLoading
+        errorMessage="Couldn't load trending movies."
+      >
+        {null}
+      </MediaRow>
+    )
+  }
+
+  if (isError) {
+    return (
+      <MediaRow
+        label="Trending"
+        title="Popular this week"
+        isError
+        errorMessage="Couldn't load trending movies."
+      >
+        {null}
+      </MediaRow>
+    )
+  }
+
   const movies = data?.results ?? []
 
   return (
@@ -16,9 +43,10 @@ export const TrendingRows = () => {
       <MediaRow
         label="Trending"
         title="Popular this week"
-        isLoading={isLoading}
-        isError={isError}
+        isEmpty={movies.length === 0}
+        emptyMessage="No trending movies right now."
         errorMessage="Couldn't load trending movies."
+        showHeading={movies.length > 0}
       >
         {movies.map((movie) => (
           <li key={movie.id}>
@@ -29,8 +57,6 @@ export const TrendingRows = () => {
 
       {TRENDING_GENRE_ROWS.map((row) => {
         const rowMovies = moviesForGenreRow(movies, row.genreIds)
-        if (isLoading) return null
-        if (isError) return null
         if (rowMovies.length < MIN_GENRE_ROW_COUNT) return null
 
         return (

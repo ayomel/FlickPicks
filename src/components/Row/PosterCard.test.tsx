@@ -1,7 +1,11 @@
-import { render, screen } from '@testing-library/react'
+import { cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
-import { describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it } from 'vitest'
 import { PosterCard } from './PosterCard'
+
+afterEach(() => {
+  cleanup()
+})
 
 describe('PosterCard', () => {
   it('links to the movie detail page', () => {
@@ -23,5 +27,24 @@ describe('PosterCard', () => {
       '/movies/550',
     )
     expect(screen.getByText('1999')).toBeInTheDocument()
+  })
+
+  it('falls back to the film icon when the poster fails', () => {
+    render(
+      <MemoryRouter>
+        <PosterCard
+          movie={{
+            id: 550,
+            title: 'Fight Club',
+            poster_path: '/broken.jpg',
+            release_date: '1999-10-15',
+          }}
+        />
+      </MemoryRouter>,
+    )
+
+    fireEvent.error(screen.getByRole('presentation'))
+    expect(screen.queryByRole('presentation')).not.toBeInTheDocument()
+    expect(document.querySelector('svg')).toBeTruthy()
   })
 })

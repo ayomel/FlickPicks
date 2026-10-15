@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { Film } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { cn } from '@/lib/utils'
@@ -13,14 +14,18 @@ export type PosterCardMovie = {
 
 type PosterCardProps = {
   movie: PosterCardMovie
+  tabIndex?: number
 }
 
-export const PosterCard = ({ movie }: PosterCardProps) => {
+export const PosterCard = ({ movie, tabIndex }: PosterCardProps) => {
+  const [imageFailed, setImageFailed] = useState(false)
   const year = movie.release_date ? formatReleaseYear(movie.release_date) : null
+  const showImage = Boolean(movie.poster_path) && !imageFailed
 
   return (
     <Link
       to={`/movies/${movie.id}`}
+      tabIndex={tabIndex}
       className={cn(
         'group/card block w-36 shrink-0 snap-start sm:w-40',
         'outline-none focus-visible:ring-2 focus-visible:ring-foreground/70 focus-visible:ring-offset-2 focus-visible:ring-offset-background',
@@ -32,10 +37,11 @@ export const PosterCard = ({ movie }: PosterCardProps) => {
           'transition-[border-color] duration-200 group-hover/card:border-brand/35',
         )}
       >
-        {movie.poster_path ? (
+        {showImage ? (
           <img
-            src={getPosterCardPath(movie.poster_path)}
+            src={getPosterCardPath(movie.poster_path!)}
             alt=""
+            onError={() => setImageFailed(true)}
             className={cn(
               'size-full object-cover transition-transform duration-200',
               '[@media(hover:hover)]:group-hover/card:scale-105',

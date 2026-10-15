@@ -34,7 +34,7 @@ export const HeroControls = ({
       userNavRef.current = false
       return
     }
-    // Autoplay advanced the slide; clear so SR does not re-announce.
+    // Autoplay advanced the slide; clear so screen readers do not re-announce.
     setLiveText('')
   }, [index, count])
 
