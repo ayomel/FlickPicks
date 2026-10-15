@@ -3,15 +3,23 @@ import type { ComponentProps } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useDebouncedValue } from '@/hooks/useDebouncedValue'
 import { MIN_SEARCH_LENGTH, useSearchQuery } from '@/hooks/useSearchQuery'
-import { SearchDropdown, SearchDropdownMessage } from './SearchDropdown'
+import {
+  SearchDropdown,
+  SearchDropdownMessage,
+  type SearchDropdownPlacement,
+} from './SearchDropdown'
 import { SearchInput } from './SearchInput'
 import { SearchResultRow } from './SearchResultRow'
 
 type MovieSearchProps = {
   autoFocus?: boolean
+  placement?: SearchDropdownPlacement
 }
 
-export const MovieSearch = ({ autoFocus = false }: MovieSearchProps) => {
+export const MovieSearch = ({
+  autoFocus = false,
+  placement = 'bottom',
+}: MovieSearchProps) => {
   const navigate = useNavigate()
   const rootRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
@@ -122,7 +130,11 @@ export const MovieSearch = ({ autoFocus = false }: MovieSearchProps) => {
         activeOptionId={activeOptionId}
       />
 
-      <SearchDropdown listboxId={listboxId} isOpen={showDropdown}>
+      <SearchDropdown
+        listboxId={listboxId}
+        isOpen={showDropdown}
+        placement={placement}
+      >
         {isLoading ? (
           <SearchDropdownMessage>Searching…</SearchDropdownMessage>
         ) : isError ? (

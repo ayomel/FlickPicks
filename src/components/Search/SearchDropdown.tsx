@@ -2,16 +2,20 @@ import type { ReactNode } from 'react'
 import { cn } from '@/lib/utils'
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion'
 
+export type SearchDropdownPlacement = 'top' | 'bottom'
+
 type SearchDropdownProps = {
   listboxId: string
   isOpen: boolean
   children: ReactNode
+  placement?: SearchDropdownPlacement
 }
 
 export const SearchDropdown = ({
   listboxId,
   isOpen,
   children,
+  placement = 'bottom',
 }: SearchDropdownProps) => {
   const reducedMotion = usePrefersReducedMotion()
 
@@ -22,7 +26,10 @@ export const SearchDropdown = ({
       id={listboxId}
       role="listbox"
       className={cn(
-        'absolute top-[calc(100%+6px)] z-[60] max-h-80 w-full overflow-y-auto rounded-lg border border-border bg-card',
+        'absolute z-[60] w-full overflow-y-auto rounded-lg border border-border bg-card',
+        placement === 'top'
+          ? 'bottom-[calc(100%+6px)] max-h-[min(20rem,60svh)]'
+          : 'top-[calc(100%+6px)] max-h-80',
         !reducedMotion && 'animate-in fade-in duration-150',
       )}
     >

@@ -23,6 +23,7 @@ const renderBar = (initialEntry = '/') => {
             path="/"
             element={
               <div>
+                <button type="button">Outside</button>
                 <div id="watchlist">Watchlist target</div>
                 <MobileTabBar />
               </div>
@@ -61,12 +62,59 @@ describe('MobileTabBar', () => {
     expect(screen.getByRole('combobox')).toHaveFocus()
   })
 
+  it('returns focus to Search when Escape closes the panel', async () => {
+    const user = userEvent.setup()
+    renderBar()
+
+    const searchTab = screen.getByRole('button', { name: 'Search' })
+    await user.click(searchTab)
+    expect(
+      screen.getByRole('dialog', { name: 'Search movies' }),
+    ).toBeInTheDocument()
+
+    await user.keyboard('{Escape}')
+
+    expect(
+      screen.queryByRole('dialog', { name: 'Search movies' }),
+    ).not.toBeInTheDocument()
+    expect(searchTab).toHaveFocus()
+  })
+
+  it('closes the search panel on a tap outside it', async () => {
+    const user = userEvent.setup()
+    renderBar()
+
+    await user.click(screen.getByRole('button', { name: 'Search' }))
+    expect(
+      screen.getByRole('dialog', { name: 'Search movies' }),
+    ).toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: 'Outside' }))
+
+    expect(
+      screen.queryByRole('dialog', { name: 'Search movies' }),
+    ).not.toBeInTheDocument()
+  })
+
   it('marks Home as the current page on /', () => {
     renderBar('/')
     expect(screen.getByRole('button', { name: 'Home' })).toHaveAttribute(
       'aria-current',
       'page',
     )
+  })
+
+  it('scrolls to the top when Home is pressed from /#watchlist', async () => {
+    const user = userEvent.setup()
+    const scrollTo = vi.fn()
+    Object.defineProperty(window, 'scrollTo', {
+      value: scrollTo,
+      configurable: true,
+    })
+    renderBar('/#watchlist')
+
+    await user.click(screen.getByRole('button', { name: 'Home' }))
+    expect(scrollTo).toHaveBeenCalledWith({ top: 0, behavior: 'smooth' })
   })
 
   it('scrolls to the watchlist anchor when Watchlist is pressed', async () => {

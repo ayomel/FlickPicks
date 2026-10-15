@@ -4,17 +4,32 @@ import FeatureMovieHero from '../components/FeatureMovieHero/FeatureMovieHero'
 import { ComingSoonRow } from '@/components/Row/ComingSoonRow'
 import { TrendingRows } from '@/components/Row/TrendingRows'
 import { WatchlistRow } from '@/components/Watchlist/WatchlistRow'
+import { useTrendingQuery } from '@/hooks/useTrendingQuery'
+import { useUpcomingQuery } from '@/hooks/useUpcomingQuery'
+import { useWatchlistMovies } from '@/hooks/useWatchlistQuery'
 
 export const Home = () => {
   const location = useLocation()
+  const trendingQuery = useTrendingQuery()
+  const upcomingQuery = useUpcomingQuery()
+  const { isLoadingMovies, movies } = useWatchlistMovies()
+
+  const rowsSettled =
+    !trendingQuery.isLoading && !upcomingQuery.isLoading && !isLoadingMovies
 
   useEffect(() => {
     if (location.hash !== '#watchlist') return
-    document.getElementById('watchlist')?.scrollIntoView({
-      behavior: 'smooth',
-      block: 'start',
+    if (!rowsSettled) return
+
+    const frame = window.requestAnimationFrame(() => {
+      document.getElementById('watchlist')?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start',
+      })
     })
-  }, [location.hash])
+
+    return () => window.cancelAnimationFrame(frame)
+  }, [location.hash, rowsSettled, movies.length])
 
   return (
     <div className="min-h-svh bg-background">
