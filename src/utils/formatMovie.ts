@@ -71,6 +71,20 @@ export const resolveTrailerUrl = (movie: MovieDetails) => {
   return null
 }
 
+export const getYoutubeEmbedUrl = (videoId: string) => {
+  return `https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&rel=0`
+}
+
+export const getYoutubeThumbUrl = (videoId: string) => {
+  return `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`
+}
+
+export const getYoutubeVideos = (movie: MovieDetails) => {
+  return (movie.videos?.results ?? []).filter(
+    (video) => video.site === 'YouTube' && Boolean(video.key),
+  )
+}
+
 export const resolveBackdropUrl = (movie: MovieDetails) => {
   if (movie.backdrop?.startsWith('http')) return movie.backdrop
   if (movie.backdrop_path) return getBackdropPath(movie.backdrop_path)

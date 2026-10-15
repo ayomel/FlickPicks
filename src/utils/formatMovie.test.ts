@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest'
-import { formatBudget, getCountryNames } from './formatMovie'
+import {
+  formatBudget,
+  getCountryNames,
+  getYoutubeEmbedUrl,
+  getYoutubeThumbUrl,
+} from './formatMovie'
 import type { MovieDetails } from '@/types/movieDetails'
 
 const baseMovie = {
@@ -28,6 +33,17 @@ describe('getCountryNames', () => {
   it('joins production country names', () => {
     expect(getCountryNames(baseMovie)).toBe(
       'United States of America, United Kingdom',
+    )
+  })
+})
+
+describe('youtube helpers', () => {
+  it('builds nocookie embed and thumbnail urls', () => {
+    expect(getYoutubeEmbedUrl('abc')).toBe(
+      'https://www.youtube-nocookie.com/embed/abc?autoplay=1&rel=0',
+    )
+    expect(getYoutubeThumbUrl('abc')).toBe(
+      'https://i.ytimg.com/vi/abc/hqdefault.jpg',
     )
   })
 })
