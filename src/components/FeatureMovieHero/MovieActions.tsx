@@ -14,7 +14,7 @@ export const MovieActions = ({ movie }: MovieActionsProps) => {
       <Link to={`/movies/${movie.id}`}>
         <Button>
           <Info data-icon="inline-start" />
-          View details
+          More info
         </Button>
       </Link>
       <AddToWatchlistButton movieId={movie.id} addLabel="Watchlist" />
