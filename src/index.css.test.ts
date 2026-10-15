@@ -3,19 +3,20 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
 
-const cssPath = path.join(
-  path.dirname(fileURLToPath(import.meta.url)),
-  'index.css',
+const css = readFileSync(
+  path.join(path.dirname(fileURLToPath(import.meta.url)), 'index.css'),
+  'utf8',
 )
 
 describe('theme tokens', () => {
-  it('sets muted-foreground to the brighter gray', () => {
-    const css = readFileSync(cssPath, 'utf8')
-    const mutedValues = [
-      ...css.matchAll(/--muted-foreground:\s*([^;]+);/g),
-    ].map((match) => match[1].trim().toLowerCase())
+  it('defines the red brand palette tokens', () => {
+    expect(css).toMatch(/--background:/)
+    expect(css).toMatch(/--primary:/)
+    expect(css).toMatch(/--brand-text:/)
+    expect(css).toMatch(/--brand-glow:/)
+  })
 
-    expect(mutedValues.length).toBeGreaterThanOrEqual(2)
-    expect(mutedValues.every((value) => value === '#b3b3b3')).toBe(true)
+  it('drops the old green brand tokens', () => {
+    expect(css).not.toMatch(/--brand-green/)
   })
 })

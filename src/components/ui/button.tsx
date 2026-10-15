@@ -14,7 +14,7 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default:
-          'border border-primary bg-primary font-semibold text-primary-foreground hover:border-[var(--brand-green-hover)] hover:bg-[var(--brand-green-hover)] focus-visible:ring-brand/30',
+          'border border-primary bg-primary font-semibold text-primary-foreground hover:border-[var(--brand-hover)] hover:bg-[var(--brand-hover)] focus-visible:ring-primary/30',
         outline:
           'border-border bg-transparent text-foreground hover:border-border hover:bg-muted aria-expanded:bg-muted aria-expanded:text-foreground',
         secondary:

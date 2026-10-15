@@ -26,9 +26,9 @@ describe('WatchlistRow', () => {
     vi.clearAllMocks()
   })
 
-  it('does not pull up over the hero with a negative top margin', () => {
+  it('renders saved titles for the shared watchlist', () => {
     const client = new QueryClient()
-    const { container } = render(
+    render(
       <QueryClientProvider client={client}>
         <MemoryRouter>
           <WatchlistRow />
@@ -36,8 +36,10 @@ describe('WatchlistRow', () => {
       </QueryClientProvider>,
     )
 
-    const section = container.querySelector('section')
-    expect(section?.className).not.toMatch(/-mt-/)
-    expect(screen.getByText('Your watchlist')).toBeInTheDocument()
+    expect(
+      screen.getByRole('heading', { name: 'Saved to watch' }),
+    ).toBeInTheDocument()
+    expect(screen.getByText('Test Movie')).toBeInTheDocument()
+    expect(screen.getByText('1 title')).toBeInTheDocument()
   })
 })

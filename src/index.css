@@ -2,26 +2,24 @@
 @import 'tw-animate-css';
 @import 'shadcn/tailwind.css';
 @import '@fontsource-variable/inter';
-@import '@fontsource/instrument-serif/400.css';
-@import '@fontsource/instrument-serif/400-italic.css';
-@import '@fontsource/space-mono/400.css';
+@import '@fontsource/inter-tight/800.css';
 
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  --brand-green: #09ae5b;
-  --brand-green-hover: #0bc568;
-  --brand-green-deep: #006239;
-  --brand-green-soft: rgba(9, 174, 91, 0.12);
+  --brand-text: #ff5a4e;
+  --brand-hover: #e5241a;
+  --brand-soft: color-mix(in srgb, var(--primary) 14%, transparent);
+  --brand-glow: color-mix(in srgb, var(--primary) 10%, transparent);
 
-  --background: #0e0f10;
+  --background: #141414;
   --foreground: #e5e5e5;
   --card: #181819;
   --card-foreground: #e5e5e5;
   --popover: #181819;
   --popover-foreground: #e5e5e5;
-  --primary: #09ae5b;
-  --primary-foreground: #08110c;
+  --primary: #d42a20;
+  --primary-foreground: #ffffff;
   --secondary: #181819;
   --secondary-foreground: #e5e5e5;
   --muted: #1e1f20;
@@ -31,21 +29,21 @@
   --destructive: #ef4444;
   --border: #2a2b2d;
   --input: #111213;
-  --ring: #09ae5b;
+  --ring: #d42a20;
   --radius: 0.375rem;
 
   color-scheme: dark;
 }
 
 .dark {
-  --background: #0e0f10;
+  --background: #141414;
   --foreground: #e5e5e5;
   --card: #181819;
   --card-foreground: #e5e5e5;
   --popover: #181819;
   --popover-foreground: #e5e5e5;
-  --primary: #09ae5b;
-  --primary-foreground: #08110c;
+  --primary: #d42a20;
+  --primary-foreground: #ffffff;
   --secondary: #181819;
   --secondary-foreground: #e5e5e5;
   --muted: #1e1f20;
@@ -55,7 +53,7 @@
   --destructive: #ef4444;
   --border: #2a2b2d;
   --input: #111213;
-  --ring: #09ae5b;
+  --ring: #d42a20;
 }
 
 #root {
@@ -69,14 +67,14 @@ body {
 
 @theme inline {
   --font-sans: 'Inter Variable', 'Inter', ui-sans-serif, system-ui, sans-serif;
-  --font-display: 'Instrument Serif', Georgia, serif;
-  --font-mono: 'Space Mono', ui-monospace, monospace;
-  --font-heading: var(--font-sans);
+  --font-heading:
+    'Inter Tight', 'Inter Variable', ui-sans-serif, system-ui, sans-serif;
+  --font-mono:
+    ui-monospace, 'SFMono-Regular', Menlo, Monaco, Consolas, monospace;
 
-  --color-brand: var(--brand-green);
-  --color-brand-hover: var(--brand-green-hover);
-  --color-brand-deep: var(--brand-green-deep);
-  --color-brand-soft: var(--brand-green-soft);
+  --color-brand: var(--brand-text);
+  --color-brand-hover: var(--brand-hover);
+  --color-brand-soft: var(--brand-soft);
 
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -119,6 +117,6 @@ body {
   h1,
   h2,
   h3 {
-    @apply m-0 font-sans font-semibold tracking-tight text-foreground;
+    @apply m-0 font-heading font-extrabold tracking-tight text-foreground;
   }
 }
