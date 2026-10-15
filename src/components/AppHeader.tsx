@@ -15,9 +15,11 @@ export const AppHeader = () => {
         <Link
           to="/"
           className={cn(
-            'inline-flex shrink-0 outline-none',
+            'inline-flex shrink-0 rounded-sm outline-none',
             'transition-opacity hover:opacity-90',
-            'focus-visible:ring-2 focus-visible:ring-brand/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background',
+            // Keep the focus ring inside the padded header so it is not clipped
+            // by backdrop-filter at narrow widths (e.g. 390px).
+            'focus-visible:ring-2 focus-visible:ring-brand/40',
           )}
         >
           <Wordmark />

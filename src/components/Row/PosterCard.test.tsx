@@ -43,8 +43,29 @@ describe('PosterCard', () => {
       </MemoryRouter>,
     )
 
-    fireEvent.error(screen.getByRole('presentation'))
-    expect(screen.queryByRole('presentation')).not.toBeInTheDocument()
+    fireEvent.error(screen.getByRole('img', { name: 'Fight Club poster' }))
+    expect(
+      screen.queryByRole('img', { name: 'Fight Club poster' }),
+    ).not.toBeInTheDocument()
     expect(document.querySelector('svg')).toBeTruthy()
+  })
+
+  it('uses a real poster alt text', () => {
+    render(
+      <MemoryRouter>
+        <PosterCard
+          movie={{
+            id: 550,
+            title: 'Fight Club',
+            poster_path: '/fight.jpg',
+            release_date: '1999-10-15',
+          }}
+        />
+      </MemoryRouter>,
+    )
+
+    expect(
+      screen.getByRole('img', { name: 'Fight Club poster' }),
+    ).toBeInTheDocument()
   })
 })

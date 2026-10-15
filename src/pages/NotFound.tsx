@@ -1,9 +1,14 @@
 import { Link } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
+import { Seo } from '@/components/Seo'
 
 export const NotFound = () => {
   return (
     <div className="flex min-h-svh flex-col items-center justify-center gap-4 bg-background px-6 pt-16 text-center">
+      <Seo
+        title="Page not found · FlickPick"
+        description="This FlickPick page does not exist."
+      />
       <h1 className="m-0 text-2xl font-semibold tracking-tight text-foreground">
         Page not found
       </h1>

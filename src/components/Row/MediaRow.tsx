@@ -229,7 +229,7 @@ export function MediaRow<T>({
                   ref={listRef}
                   aria-label={title}
                   className={cn(
-                    'm-0 flex min-w-0 flex-1 list-none gap-3 overflow-x-auto py-2',
+                    'm-0 flex min-w-0 flex-1 list-none gap-3 overflow-x-auto py-3',
                     'snap-x snap-mandatory scroll-smooth [scrollbar-width:thin]',
                     'px-1 scroll-px-1 sm:scroll-px-12',
                   )}

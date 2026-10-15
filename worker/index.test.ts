@@ -1,9 +1,58 @@
-import { describe, expect, it } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import worker from './index'
 import type { Env } from './index'
+import { escapeHtml } from './meta'
 
 const SHELL_HTML =
-  '<!doctype html><html><body><div id="root"></div></body></html>'
+  '<!doctype html><html><head><title>FlickPick</title></head><body><div id="root"></div></body></html>'
+
+class FakeHTMLRewriter {
+  private titleHandler?: {
+    element: (el: { setInnerContent: (v: string) => void }) => void
+  }
+  private headHandler?: {
+    element: (el: {
+      append: (html: string, opts: { html: boolean }) => void
+    }) => void
+  }
+
+  on(selector: string, handlers: { element: (el: never) => void }) {
+    if (selector === 'title') this.titleHandler = handlers
+    if (selector === 'head') this.headHandler = handlers
+    return this
+  }
+
+  transform(response: Response) {
+    return (async () => {
+      let html = await response.text()
+      if (this.titleHandler) {
+        let titleText = ''
+        this.titleHandler.element({
+          setInnerContent(value: string) {
+            titleText = escapeHtml(value)
+          },
+        })
+        html = html.replace(
+          /<title>.*?<\/title>/,
+          `<title>${titleText}</title>`,
+        )
+      }
+      if (this.headHandler) {
+        let appended = ''
+        this.headHandler.element({
+          append(value: string) {
+            appended += value
+          },
+        })
+        html = html.replace('</head>', `${appended}</head>`)
+      }
+      return new Response(html, {
+        status: response.status,
+        headers: response.headers,
+      })
+    })()
+  }
+}
 
 const requestUrl = (input: RequestInfo | URL) => {
   if (typeof input === 'string') return new URL(input)
@@ -68,6 +117,18 @@ describe('worker fetch handler', () => {
     '/assets/hero.png': { body: 'png-bytes', type: 'image/png' },
   }
 
+  beforeEach(() => {
+    vi.stubGlobal('HTMLRewriter', FakeHTMLRewriter)
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue(new Response('nope', { status: 500 })),
+    )
+  })
+
+  afterEach(() => {
+    vi.unstubAllGlobals()
+  })
+
   it('returns 200 shell for / and numeric movie routes', async () => {
     const env = envWith(files)
 
@@ -104,6 +165,46 @@ describe('worker fetch handler', () => {
 
     const missingPng = await handle('/assets/missing.png', env)
     expect(missingPng.status).toBe(404)
+  })
+
+  it('injects escaped movie meta for /movies/:id when the API succeeds', async () => {
+    const fetchMock = vi.fn().mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          id: 603,
+          title: 'The Matrix & Co',
+          overview: 'A <hacker> joins rebels.',
+          backdrop_path: '/matrix.jpg',
+        }),
+        { status: 200, headers: { 'content-type': 'application/json' } },
+      ),
+    )
+    vi.stubGlobal('fetch', fetchMock)
+
+    const response = await handle('/movies/603', envWith(files))
+    const html = await response.text()
+
+    expect(response.status).toBe(200)
+    expect(html).toContain('<title>The Matrix &amp; Co · FlickPick</title>')
+    expect(html).toContain('A &lt;hacker&gt; joins rebels.')
+    expect(html).toContain('property="og:title"')
+    expect(html).toContain('rel="canonical"')
+    expect(html).toContain('https://flickpick.mel-2cb.workers.dev/movies/603')
+    expect(fetchMock).toHaveBeenCalled()
+  })
+
+  it('serves the SPA unchanged when the movie meta fetch fails', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue(new Response('nope', { status: 500 })),
+    )
+
+    const response = await handle('/movies/603', envWith(files))
+    const html = await response.text()
+
+    expect(response.status).toBe(200)
+    expect(html).toContain('<title>FlickPick</title>')
+    expect(html).not.toContain('property="og:title"')
   })
 
   it('fetches the shell from / instead of following /index.html redirects', async () => {

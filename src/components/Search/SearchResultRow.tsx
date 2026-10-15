@@ -41,7 +41,7 @@ export const SearchResultRow = ({
         {movie.poster_path ? (
           <img
             src={getPosterThumbPath(movie.poster_path)}
-            alt=""
+            alt={`${movie.title} poster`}
             className="size-full object-cover"
           />
         ) : (

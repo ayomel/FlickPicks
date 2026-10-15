@@ -1,4 +1,5 @@
 import { isAppShellPath, isStaticAssetPath } from './routes'
+import { fetchMovieMeta, injectMovieMeta } from './meta'
 
 export interface Env {
   ASSETS: Fetcher
@@ -12,6 +13,11 @@ const fetchShell = (request: Request, env: Env) =>
 const isHtmlResponse = (response: Response) => {
   const contentType = response.headers.get('content-type') ?? ''
   return contentType.includes('text/html')
+}
+
+const movieIdFromPath = (pathname: string) => {
+  const match = pathname.match(/^\/movies\/(\d+)$/)
+  return match?.[1] ?? null
 }
 
 export default {
@@ -29,6 +35,15 @@ export default {
     }
 
     const shell = await fetchShell(request, env)
+    const movieId = movieIdFromPath(pathname)
+
+    if (movieId) {
+      const movie = await fetchMovieMeta(movieId)
+      if (movie) {
+        return injectMovieMeta(shell, movie)
+      }
+      return shell
+    }
 
     if (isAppShellPath(pathname)) {
       return shell

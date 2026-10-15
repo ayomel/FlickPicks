@@ -4,6 +4,7 @@ import FeatureMovieHero from '../components/FeatureMovieHero/FeatureMovieHero'
 import { ComingSoonRow } from '@/components/Row/ComingSoonRow'
 import { TrendingRows } from '@/components/Row/TrendingRows'
 import { WatchlistRow } from '@/components/Watchlist/WatchlistRow'
+import { Seo } from '@/components/Seo'
 import { useTrendingQuery } from '@/hooks/useTrendingQuery'
 import { useUpcomingQuery } from '@/hooks/useUpcomingQuery'
 import { useWatchlistMovies } from '@/hooks/useWatchlistQuery'
@@ -33,6 +34,10 @@ export const Home = () => {
 
   return (
     <div className="min-h-svh bg-background">
+      <Seo
+        title="FlickPick"
+        description="Browse trending movies, coming soon titles, and a shared watchlist."
+      />
       <FeatureMovieHero />
       <div className="relative z-10 pb-[calc(5.5rem+env(safe-area-inset-bottom))] sm:pb-16">
         <TrendingRows />
