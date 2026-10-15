@@ -7,7 +7,7 @@ export const HeroOverlay = () => {
         className="absolute inset-0 opacity-70"
         style={{
           background:
-            'radial-gradient(circle at 20% 80%, rgba(212, 42, 32, 0.1), transparent 55%)',
+            'radial-gradient(circle at 20% 80%, var(--brand-glow), transparent 55%)',
         }}
       />
     </div>

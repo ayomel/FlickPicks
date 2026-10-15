@@ -9,7 +9,8 @@
 :root {
   --brand-text: #ff5a4e;
   --brand-hover: #e5241a;
-  --brand-soft: rgba(212, 42, 32, 0.14);
+  --brand-soft: color-mix(in srgb, var(--primary) 14%, transparent);
+  --brand-glow: color-mix(in srgb, var(--primary) 10%, transparent);
 
   --background: #141414;
   --foreground: #e5e5e5;
