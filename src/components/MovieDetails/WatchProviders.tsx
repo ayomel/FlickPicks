@@ -18,9 +18,9 @@ const ProviderGroup = ({
 
   return (
     <div className="flex flex-col gap-3">
-      <h3 className="m-0 font-mono text-xs font-semibold tracking-[0.08em] text-muted-foreground uppercase">
+      <h2 className="m-0 font-mono text-xs font-semibold tracking-[0.08em] text-muted-foreground uppercase">
         {label}
-      </h3>
+      </h2>
       <ul className="m-0 flex list-none flex-wrap gap-2 p-0">
         {items.map((provider) => (
           <li key={`${label}-${provider.provider_id}`}>

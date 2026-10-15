@@ -15,6 +15,7 @@ export const MovieMetadata = ({ movie }: MovieMetadataProps) => {
   const year = formatReleaseYear(movie.release_date)
   const runtime = formatRuntime(movie.runtime)
   const metaParts = [year, runtime].filter(Boolean)
+  const showRating = movie.vote_count > 0
 
   return (
     <div className="flex max-w-3xl flex-col gap-4">
@@ -26,20 +27,24 @@ export const MovieMetadata = ({ movie }: MovieMetadataProps) => {
           {movie.tagline}
         </p>
       ) : null}
-      <div className="flex flex-wrap items-center gap-3">
-        <Badge
-          variant="outline"
-          className="h-6 gap-1 border-brand/30 bg-brand-soft px-2 text-brand"
-        >
-          <Star className="size-3 fill-brand text-brand" aria-hidden />
-          {formatRating(movie.vote_average)}
-        </Badge>
-        {metaParts.length > 0 ? (
-          <p className="m-0 font-mono text-xs text-muted-foreground">
-            {metaParts.join(' · ')}
-          </p>
-        ) : null}
-      </div>
+      {showRating || metaParts.length > 0 ? (
+        <div className="flex flex-wrap items-center gap-3">
+          {showRating ? (
+            <Badge
+              variant="outline"
+              className="h-6 gap-1 border-brand/30 bg-brand-soft px-2 text-brand"
+            >
+              <Star className="size-3 fill-brand text-brand" aria-hidden />
+              {formatRating(movie.vote_average)}
+            </Badge>
+          ) : null}
+          {metaParts.length > 0 ? (
+            <p className="m-0 font-mono text-xs text-muted-foreground">
+              {metaParts.join(' · ')}
+            </p>
+          ) : null}
+        </div>
+      ) : null}
     </div>
   )
 }

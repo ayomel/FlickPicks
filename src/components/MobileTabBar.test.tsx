@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { afterEach, describe, expect, it, vi } from 'vitest'
+import { Button } from '@/components/ui/button'
 import { MobileTabBar } from './MobileTabBar'
 
 afterEach(() => {
@@ -24,6 +25,7 @@ const renderBar = (initialEntry = '/') => {
             element={
               <div>
                 <button type="button">Outside</button>
+                <Button>Add to watchlist</Button>
                 <div id="watchlist">Watchlist target</div>
                 <MobileTabBar />
               </div>
@@ -98,6 +100,22 @@ describe('MobileTabBar', () => {
     ).not.toBeInTheDocument()
     expect(searchTab).not.toHaveFocus()
     expect(outside).toHaveFocus()
+  })
+
+  it('closes the search panel when a React Aria Button outside is tapped', async () => {
+    const user = userEvent.setup()
+    renderBar()
+
+    await user.click(screen.getByRole('button', { name: 'Search' }))
+    expect(
+      screen.getByRole('dialog', { name: 'Search movies' }),
+    ).toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: 'Add to watchlist' }))
+
+    expect(
+      screen.queryByRole('dialog', { name: 'Search movies' }),
+    ).not.toBeInTheDocument()
   })
 
   it('marks Home as the current page on /', () => {

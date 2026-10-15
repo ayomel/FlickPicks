@@ -1,4 +1,4 @@
-import { cleanup, render, screen } from '@testing-library/react'
+import { cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { afterEach, describe, expect, it } from 'vitest'
 import { MovieDetailsInfo } from './MovieDetailsInfo'
 import type { MovieDetails } from '@/types/movieDetails'
@@ -47,5 +47,13 @@ describe('MovieDetailsInfo', () => {
     )
     expect(screen.queryByText('Budget')).not.toBeInTheDocument()
     expect(screen.queryByText('$63M')).not.toBeInTheDocument()
+  })
+
+  it('falls back to the Film icon when the poster fails', () => {
+    render(<MovieDetailsInfo movie={movie} />)
+
+    fireEvent.error(screen.getByRole('presentation'))
+    expect(screen.queryByRole('presentation')).not.toBeInTheDocument()
+    expect(document.querySelector('svg')).toBeTruthy()
   })
 })

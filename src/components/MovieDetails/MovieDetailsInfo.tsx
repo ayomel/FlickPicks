@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { Film } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { SectionLabel } from '@/components/ui/section-label'
@@ -32,7 +33,9 @@ type MovieDetailsInfoProps = {
 }
 
 export const MovieDetailsInfo = ({ movie }: MovieDetailsInfoProps) => {
+  const [posterFailed, setPosterFailed] = useState(false)
   const posterUrl = resolvePosterUrl(movie)
+  const showPoster = Boolean(posterUrl) && !posterFailed
   const countries = getCountryNames(movie)
   const studios = getStudioNames(movie)
   const budget = formatBudget(movie.budget)
@@ -41,12 +44,15 @@ export const MovieDetailsInfo = ({ movie }: MovieDetailsInfoProps) => {
   return (
     <aside className="flex flex-col gap-6">
       <div className="overflow-hidden rounded-md border border-border bg-card">
-        {posterUrl ? (
+        {showPoster && posterUrl ? (
           <img
             src={posterUrl}
             alt=""
             width={342}
             height={513}
+            loading="lazy"
+            decoding="async"
+            onError={() => setPosterFailed(true)}
             className="aspect-[2/3] w-full object-cover"
           />
         ) : (
