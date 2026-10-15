@@ -43,7 +43,7 @@ export const Home = () => {
         shareable
       />
       <FeatureMovieHero />
-      <div className="relative z-10 pb-[calc(5.5rem+env(safe-area-inset-bottom))] sm:pb-16">
+      <div className="relative z-10 pb-8 sm:pb-16">
         <TrendingRows />
         <ComingSoonRow />
         <div id="watchlist" className="scroll-mt-20">
