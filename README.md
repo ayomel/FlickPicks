@@ -1,73 +1,50 @@
-# React + TypeScript + Vite
+# FlickPick (frontend)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+React + Vite SPA for browsing trending movies and a shared watchlist.
 
-Currently, two official plugins are available:
+- Live site: [flickpick.mel-2cb.workers.dev](https://flickpick.mel-2cb.workers.dev/)
+- API: [flickpicks.fastapicloud.dev](https://flickpicks.fastapicloud.dev/) via `VITE_API_URL`
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Local development
 
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+pnpm install
+pnpm dev
 ```
 
-You can also install [eslint-plugin-react-x](https://npmx.dev/package/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://npmx.dev/package/eslint-plugin-react-dom) for React-specific lint rules:
+Set `VITE_API_URL` to `https://flickpicks.fastapicloud.dev/` (see `.env`).
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+pnpm lint
+pnpm typecheck
+pnpm test
+pnpm build
+pnpm preview
 ```
+
+## Deploy (Cloudflare Workers Git integration)
+
+Production deploys through the Cloudflare dashboard Git integration for the `flickpick` Worker. There is no CI pipeline in this repo.
+
+`wrangler.jsonc` is the config that integration uses:
+
+- Worker name: `flickpick` (same as the live script on `mel-2cb.workers.dev`)
+- Assets directory: `./dist` (Vite build output)
+- `not_found_handling`: `single-page-application` (same SPA fallback the live Worker uses today)
+
+The Worker script returns HTTP 404 for unknown paths while still serving `index.html`, so the client `NotFound` page can render. Valid `/` and `/movies/:digits` deep links stay on 200.
+
+Optional local packaging check (does not publish):
+
+```bash
+pnpm deploy:dry
+```
+
+## Edge routing
+
+| Path          | HTTP status | Body                                |
+| ------------- | ----------- | ----------------------------------- |
+| `/`           | 200         | `index.html`                        |
+| `/movies/123` | 200         | `index.html`                        |
+| other paths   | 404         | `index.html` (SPA shell / NotFound) |
+| `/assets/*`   | 200         | hashed static files                 |
