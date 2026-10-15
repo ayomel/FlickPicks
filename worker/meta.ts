@@ -56,10 +56,12 @@ export const buildMetaTagsHtml = (movie: MovieMetaSource) => {
     .join('')
 }
 
+export type FetchMovieMetaResult = MovieMetaSource | 'not_found' | null
+
 export const fetchMovieMeta = async (
   id: string,
   apiOrigin = DEFAULT_API_ORIGIN,
-): Promise<MovieMetaSource | null> => {
+): Promise<FetchMovieMetaResult> => {
   try {
     const response = await fetch(
       `${apiOrigin.replace(/\/$/, '')}/movies/${id}`,
@@ -71,6 +73,7 @@ export const fetchMovieMeta = async (
         },
       },
     )
+    if (response.status === 404) return 'not_found'
     if (!response.ok) return null
     const data = (await response.json()) as MovieMetaSource
     if (!data?.id || !data?.title) return null

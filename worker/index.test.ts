@@ -184,6 +184,9 @@ describe('worker fetch handler', () => {
     for (const path of ['/nope', '/movies/abc']) {
       const response = await handle(path, env)
       expect(response.status).toBe(404)
+      expect(response.headers.get('X-Robots-Tag')).toBe('noindex')
+      expect(response.headers.get('ETag')).toBeNull()
+      expect(response.headers.get('Last-Modified')).toBeNull()
       expect(await response.text()).toContain('id="root"')
     }
   })
@@ -248,6 +251,24 @@ describe('worker fetch handler', () => {
     const html = await response.text()
 
     expect(response.status).toBe(200)
+    expect(html).toContain('<title>FlickPick</title>')
+    expect(html).not.toContain('property="og:title"')
+  })
+
+  it('returns 404 with the SPA shell when the movie API responds 404', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue(new Response('missing', { status: 404 })),
+    )
+
+    const response = await handle('/movies/4040', envWith(files))
+    const html = await response.text()
+
+    expect(response.status).toBe(404)
+    expect(response.headers.get('X-Robots-Tag')).toBe('noindex')
+    expect(response.headers.get('ETag')).toBeNull()
+    expect(response.headers.get('Last-Modified')).toBeNull()
+    expect(html).toContain('id="root"')
     expect(html).toContain('<title>FlickPick</title>')
     expect(html).not.toContain('property="og:title"')
   })

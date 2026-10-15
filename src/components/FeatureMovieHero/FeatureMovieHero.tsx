@@ -1,6 +1,7 @@
 import { useTrendingQuery } from '@/hooks/useTrendingQuery'
 import { useHeroSlideshow } from '@/hooks/useHeroSlideshow'
 import { hasBackdrop } from '@/types/trending'
+import { cn } from '@/lib/utils'
 import { HeroBackground } from './HeroBackground'
 import { HeroOverlay } from './HeroOverlay'
 import { HeroContent } from './HeroContent'
@@ -11,9 +12,17 @@ import { MovieDescription } from './MovieDescription'
 import { MovieActions } from './MovieActions'
 import { HeroControls } from './HeroControls'
 
+const heroHeightClass =
+  'h-[620px] min-h-[560px] sm:h-[min(78svh,760px)] sm:min-h-[560px]'
+
 const HeroFrame = ({ children }: { children: string }) => {
   return (
-    <section className="flex min-h-svh items-end bg-background px-6 pb-16 pt-16 text-sm text-muted-foreground sm:px-8 lg:px-10">
+    <section
+      className={cn(
+        'flex items-end bg-background px-6 pb-16 pt-16 text-sm text-muted-foreground sm:px-8 lg:px-10',
+        heroHeightClass,
+      )}
+    >
       <p className="m-0 font-mono text-xs">{children}</p>
     </section>
   )
@@ -29,7 +38,9 @@ export const FeatureMovieHero = () => {
     next,
     prev,
     goTo,
-    setPaused,
+    setContentHovered,
+    setControlsHovered,
+    setFocused,
     reducedMotion,
   } = useHeroSlideshow(movies.length)
   const movie = movies[index]
@@ -48,17 +59,18 @@ export const FeatureMovieHero = () => {
 
   return (
     <section
-      className="relative min-h-svh overflow-hidden bg-background text-foreground"
-      onMouseEnter={() => setPaused(true)}
-      onMouseLeave={() => setPaused(false)}
-      onFocusCapture={() => setPaused(true)}
+      className={cn(
+        'relative overflow-hidden bg-background text-foreground',
+        heroHeightClass,
+      )}
+      onFocusCapture={() => setFocused(true)}
       onBlurCapture={(event) => {
         const nextFocus = event.relatedTarget
         if (
           !(nextFocus instanceof Node) ||
           !event.currentTarget.contains(nextFocus)
         ) {
-          setPaused(false)
+          setFocused(false)
         }
       }}
     >
@@ -67,22 +79,44 @@ export const FeatureMovieHero = () => {
         reducedMotion={reducedMotion}
       />
       <HeroOverlay />
-      <HeroContent>
-        <HeroRankTag rank={index + 1} />
-        <MovieYear releaseDate={movie.release_date} />
-        <MovieTitle title={movie.title} />
-        <MovieDescription overview={movie.overview} />
-        <MovieActions movie={movie} />
-      </HeroContent>
-      <HeroControls
-        index={index}
-        count={movies.length}
-        progress={progress}
-        playing={playing}
-        onPrev={prev}
-        onNext={next}
-        onGoTo={goTo}
-      />
+      <div
+        data-testid="hero-content-hotzone"
+        onMouseOver={() => setContentHovered(true)}
+        onMouseOut={(event) => {
+          const next = event.relatedTarget
+          if (!(next instanceof Node) || !event.currentTarget.contains(next)) {
+            setContentHovered(false)
+          }
+        }}
+      >
+        <HeroContent>
+          <HeroRankTag rank={index + 1} />
+          <MovieYear releaseDate={movie.release_date} />
+          <MovieTitle title={movie.title} />
+          <MovieDescription overview={movie.overview} />
+          <MovieActions movie={movie} />
+        </HeroContent>
+      </div>
+      <div
+        data-testid="hero-controls-hotzone"
+        onMouseOver={() => setControlsHovered(true)}
+        onMouseOut={(event) => {
+          const next = event.relatedTarget
+          if (!(next instanceof Node) || !event.currentTarget.contains(next)) {
+            setControlsHovered(false)
+          }
+        }}
+      >
+        <HeroControls
+          index={index}
+          count={movies.length}
+          progress={progress}
+          playing={playing}
+          onPrev={prev}
+          onNext={next}
+          onGoTo={goTo}
+        />
+      </div>
     </section>
   )
 }

@@ -7,6 +7,7 @@ type SeoProps = {
   ogType?: string
   ogImage?: string | null
   shareable?: boolean
+  noindex?: boolean
 }
 
 const upsertMeta = (
@@ -59,12 +60,16 @@ export const Seo = ({
   ogType,
   ogImage,
   shareable = false,
+  noindex = false,
 }: SeoProps) => {
   useLayoutEffect(() => {
     document.title = title
 
     if (description) upsertMeta('name', 'description', description)
     else removeMeta('name', 'description')
+
+    if (noindex) upsertMeta('name', 'robots', 'noindex')
+    else removeMeta('name', 'robots')
 
     if (shareable) {
       upsertMeta('property', 'og:title', title)
@@ -90,7 +95,7 @@ export const Seo = ({
       removeMeta('property', 'og:url')
       removeCanonical()
     }
-  }, [title, description, canonical, ogType, ogImage, shareable])
+  }, [title, description, canonical, ogType, ogImage, shareable, noindex])
 
   return null
 }

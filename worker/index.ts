@@ -23,6 +23,17 @@ const movieIdFromPath = (pathname: string) => {
   return match?.[1] ?? null
 }
 
+const notFoundShell = (shell: Response) => {
+  const headers = new Headers(shell.headers)
+  headers.set('X-Robots-Tag', 'noindex')
+  headers.delete('ETag')
+  headers.delete('Last-Modified')
+  return new Response(shell.body, {
+    status: 404,
+    headers,
+  })
+}
+
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const { pathname } = new URL(request.url)
@@ -45,9 +56,13 @@ export default {
         movieId,
         env.API_ORIGIN ?? DEFAULT_API_ORIGIN,
       )
+      if (movie === 'not_found') {
+        return notFoundShell(shell)
+      }
       if (movie) {
         return injectMovieMeta(shell, movie)
       }
+      // Timeouts and 5xx keep a 200 SPA shell so the client can retry.
       return shell
     }
 
@@ -56,9 +71,6 @@ export default {
     }
 
     // Real 404 status with the SPA shell so React can render NotFound.
-    return new Response(shell.body, {
-      status: 404,
-      headers: shell.headers,
-    })
+    return notFoundShell(shell)
   },
 } satisfies ExportedHandler<Env>
