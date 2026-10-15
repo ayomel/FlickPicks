@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import { MovieSearch } from '@/components/Search/MovieSearch'
+import { Wordmark } from '@/components/brand/Wordmark'
 import { cn } from '@/lib/utils'
 
 export const AppHeader = () => {
@@ -14,13 +15,12 @@ export const AppHeader = () => {
         <Link
           to="/"
           className={cn(
-            'inline-flex shrink-0 items-baseline gap-0.5 text-sm font-semibold tracking-tight outline-none',
+            'inline-flex shrink-0 outline-none',
             'transition-opacity hover:opacity-90',
             'focus-visible:ring-2 focus-visible:ring-brand/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background',
           )}
         >
-          <span className="text-foreground">Flick</span>
-          <span className="font-display text-base text-brand">Pick</span>
+          <Wordmark />
         </Link>
         <div className="w-full sm:ml-auto sm:max-w-lg">
           <MovieSearch />
