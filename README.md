@@ -42,9 +42,9 @@ pnpm deploy:dry
 
 ## Edge routing
 
-| Path | HTTP status | Body |
-| --- | --- | --- |
-| `/` | 200 | `index.html` |
-| `/movies/123` | 200 | `index.html` |
-| other paths | 404 | `index.html` (SPA shell / NotFound) |
-| `/assets/*` | 200 | hashed static files |
+| Path          | HTTP status | Body                                |
+| ------------- | ----------- | ----------------------------------- |
+| `/`           | 200         | `index.html`                        |
+| `/movies/123` | 200         | `index.html`                        |
+| other paths   | 404         | `index.html` (SPA shell / NotFound) |
+| `/assets/*`   | 200         | hashed static files                 |

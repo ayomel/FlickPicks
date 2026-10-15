@@ -5,14 +5,27 @@ export interface Env {
 }
 
 const fetchShell = (request: Request, env: Env) =>
-  env.ASSETS.fetch(new Request(new URL('/index.html', request.url), request))
+  env.ASSETS.fetch(
+    new Request(new URL('/', request.url), { headers: request.headers }),
+  )
+
+const isHtmlResponse = (response: Response) => {
+  const contentType = response.headers.get('content-type') ?? ''
+  return contentType.includes('text/html')
+}
 
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const { pathname } = new URL(request.url)
 
     if (isStaticAssetPath(pathname)) {
-      return env.ASSETS.fetch(request)
+      const asset = await env.ASSETS.fetch(request)
+      // SPA not_found_handling serves index.html for missing files.
+      // Hashed /assets/*.js and images must stay hard 404s.
+      if (isHtmlResponse(asset)) {
+        return new Response('Not found', { status: 404 })
+      }
+      return asset
     }
 
     const shell = await fetchShell(request, env)

@@ -20,4 +20,3 @@ export default defineConfig({
     include: ['src/**/*.test.{ts,tsx}', 'worker/**/*.test.ts'],
   },
 })
-

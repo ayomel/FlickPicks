@@ -11,10 +11,11 @@
     "binding": "ASSETS",
     // Same SPA fallback the live Worker uses today (confirmed via Workers versions API).
     "not_found_handling": "single-page-application",
-    // Needed so the Worker can set HTTP 404 while still serving the shell.
-    // Hashed Vite assets stay asset-first for caching.
-    "run_worker_first": ["/*", "!/assets/*"],
+    // Worker runs first so it can set HTTP 404 for unknown routes and
+    // missing /assets/* files (SPA fallback would otherwise serve HTML).
+    "run_worker_first": true,
   },
+  "previews": {},
   "observability": {
     "enabled": true,
   },
