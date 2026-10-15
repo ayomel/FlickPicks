@@ -8,8 +8,8 @@ export const AppHeader = () => {
     <header className="fixed inset-x-0 top-0 z-50">
       <div
         className={cn(
-          'flex flex-col gap-3 border-b border-border/80 px-6 py-3 sm:h-16 sm:flex-row sm:items-center sm:gap-6 sm:py-0 sm:px-8',
-          'bg-background/92 backdrop-blur-md',
+          'flex h-14 items-center gap-6 border-b border-border/80 bg-background/92 px-6 backdrop-blur-md',
+          'sm:h-16 sm:px-8',
         )}
       >
         <Link
@@ -22,7 +22,7 @@ export const AppHeader = () => {
         >
           <Wordmark />
         </Link>
-        <div className="w-full sm:ml-auto sm:max-w-lg">
+        <div className="ml-auto hidden w-full max-w-lg sm:block">
           <MovieSearch />
         </div>
       </div>

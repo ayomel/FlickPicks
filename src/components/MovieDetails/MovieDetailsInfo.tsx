@@ -32,7 +32,7 @@ type MovieDetailsInfoProps = {
 
 export const MovieDetailsInfo = ({ movie }: MovieDetailsInfoProps) => {
   return (
-    <PageSection className="pb-16">
+    <PageSection className="pb-[calc(5.5rem+env(safe-area-inset-bottom))] sm:pb-16">
       <SectionLabel className="mb-6">Details</SectionLabel>
       <dl className="m-0 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
         <DetailItem

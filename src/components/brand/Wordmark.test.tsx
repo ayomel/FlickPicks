@@ -31,5 +31,6 @@ describe('AppHeader', () => {
     expect(home).toHaveTextContent('Flick')
     expect(home).toHaveTextContent('Pick')
     expect(home.textContent).toContain('◆')
+    expect(screen.getByRole('combobox')).toBeInTheDocument()
   })
 })
