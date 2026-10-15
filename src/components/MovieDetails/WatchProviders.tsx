@@ -1,5 +1,4 @@
 import { PageSection } from '@/components/ui/page-section'
-import { SectionLabel } from '@/components/ui/section-label'
 import type { StreamingProviders, WatchProvider } from '@/types/movieDetails'
 import { getProviderLogoUrl } from '@/utils/formatMovie'
 
@@ -18,9 +17,9 @@ const ProviderGroup = ({
 
   return (
     <div className="flex flex-col gap-3">
-      <h2 className="m-0 font-mono text-xs font-semibold tracking-[0.08em] text-muted-foreground uppercase">
+      <h3 className="m-0 font-mono text-xs font-semibold tracking-[0.08em] text-muted-foreground uppercase">
         {label}
-      </h2>
+      </h3>
       <ul className="m-0 flex list-none flex-wrap gap-2 p-0">
         {items.map((provider) => (
           <li key={`${label}-${provider.provider_id}`}>
@@ -43,12 +42,16 @@ const ProviderGroup = ({
 
 export const WatchProviders = ({ providers }: WatchProvidersProps) => {
   const stream = providers?.flatrate ?? []
-  const hasAny = stream.length > 0
+  const rent = providers?.rent ?? []
+  const buy = providers?.buy ?? []
+  const hasAny = stream.length > 0 || rent.length > 0 || buy.length > 0
 
   if (!hasAny) {
     return (
       <PageSection>
-        <SectionLabel className="mb-3">Where to watch</SectionLabel>
+        <h2 className="mb-3 font-mono text-xs font-semibold tracking-[0.08em] text-brand uppercase">
+          Where to watch
+        </h2>
         <p className="m-0 text-sm text-muted-foreground">
           Streaming availability is currently unavailable.
         </p>
@@ -58,9 +61,13 @@ export const WatchProviders = ({ providers }: WatchProvidersProps) => {
 
   return (
     <PageSection>
-      <SectionLabel className="mb-6">Where to watch</SectionLabel>
+      <h2 className="mb-6 font-mono text-xs font-semibold tracking-[0.08em] text-brand uppercase">
+        Where to watch
+      </h2>
       <div className="flex flex-col gap-8 sm:flex-row sm:flex-wrap sm:gap-12">
         <ProviderGroup label="Stream" items={stream} />
+        <ProviderGroup label="Rent" items={rent} />
+        <ProviderGroup label="Buy" items={buy} />
       </div>
     </PageSection>
   )

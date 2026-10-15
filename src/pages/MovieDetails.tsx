@@ -7,8 +7,9 @@ import { WatchProviders } from '@/components/MovieDetails/WatchProviders'
 import { MovieDetailsInfo } from '@/components/MovieDetails/MovieDetailsInfo'
 import { MovieDetailsSkeleton } from '@/components/MovieDetails/MovieDetailsSkeleton'
 import { MovieDetailsError } from '@/components/MovieDetails/MovieDetailsError'
-import { TrailerLink } from '@/components/MovieDetails/TrailerLink'
+import { TrailerPlayer } from '@/components/MovieDetails/TrailerPlayer'
 import { AddToWatchlistButton } from '@/components/MovieDetails/AddToWatchlistButton'
+import { VideosRow } from '@/components/MovieDetails/VideosRow'
 import { isNumericMovieId } from '@/utils/isNumericMovieId'
 
 export const MovieDetails = () => {
@@ -44,7 +45,7 @@ export const MovieDetails = () => {
           <div className="flex min-w-0 flex-col gap-8">
             <MovieOverview overview={data.overview} />
             <div className="flex flex-wrap gap-3">
-              <TrailerLink movie={data} />
+              <TrailerPlayer movie={data} />
               <AddToWatchlistButton movieId={data.id} />
             </div>
           </div>
@@ -53,6 +54,7 @@ export const MovieDetails = () => {
         </div>
       </div>
 
+      <VideosRow movie={data} />
       <WatchProviders providers={data.streaming_providers} />
     </div>
   )

@@ -19,7 +19,7 @@ export const MovieMetadata = ({ movie }: MovieMetadataProps) => {
 
   return (
     <div className="flex max-w-3xl flex-col gap-4">
-      <h1 className="m-0 text-[clamp(2rem,5vw,3.5rem)] leading-none font-semibold tracking-[-0.035em] text-foreground">
+      <h1 className="m-0 text-[clamp(2rem,5vw,3.5rem)] leading-none font-semibold tracking-[-0.035em] text-foreground [overflow-wrap:anywhere]">
         {movie.title}
       </h1>
       {movie.tagline ? (

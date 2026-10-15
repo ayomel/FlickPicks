@@ -35,4 +35,21 @@ describe('MovieMetadata', () => {
 
     expect(screen.getByText('8.2')).toBeInTheDocument()
   })
+
+  it('allows long titles to wrap anywhere', () => {
+    render(
+      <MovieMetadata
+        movie={{
+          ...movie,
+          title: 'SupercalifragilisticexpialidociousMovieTitleWithoutSpaces',
+        }}
+      />,
+    )
+
+    expect(
+      screen.getByRole('heading', {
+        name: 'SupercalifragilisticexpialidociousMovieTitleWithoutSpaces',
+      }),
+    ).toHaveClass('[overflow-wrap:anywhere]')
+  })
 })
