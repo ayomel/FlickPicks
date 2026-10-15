@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
-const INTERVAL_MS = 6000
+export const HERO_INTERVAL_MS = 6000
 
 const usePrefersReducedMotion = () => {
   const [reduced, setReduced] = useState(false)
@@ -22,19 +22,52 @@ const wrapIndex = (value: number, length: number) =>
 
 export const useHeroSlideshow = (length: number) => {
   const [rawIndex, setRawIndex] = useState(0)
-  const [paused, setPaused] = useState(false)
+  const [paused, setPausedState] = useState(false)
+  const [progress, setProgress] = useState(0)
+  const [progressRawIndex, setProgressRawIndex] = useState(0)
+  const animStartedAtRef = useRef<number | null>(null)
   const reducedMotion = usePrefersReducedMotion()
   const index = wrapIndex(rawIndex, length)
+  const playing = length > 1 && !paused && !reducedMotion
+
+  if (progressRawIndex !== rawIndex) {
+    setProgressRawIndex(rawIndex)
+    setProgress(0)
+  }
 
   useEffect(() => {
-    if (length <= 1 || paused || reducedMotion) return
+    if (!playing) {
+      animStartedAtRef.current = null
+      return
+    }
 
-    const timer = window.setInterval(() => {
+    // Resume from the frozen progress instead of restarting the slide.
+    const start = performance.now() - progress * HERO_INTERVAL_MS
+    animStartedAtRef.current = start
+    const remaining = Math.max(0, HERO_INTERVAL_MS * (1 - progress))
+
+    const timer = window.setTimeout(() => {
+      setProgress(0)
       setRawIndex((current) => current + 1)
-    }, INTERVAL_MS)
+    }, remaining)
 
-    return () => window.clearInterval(timer)
-  }, [length, paused, reducedMotion])
+    return () => {
+      window.clearTimeout(timer)
+    }
+    // progress is sampled when playback starts or resumes, not tracked per frame
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- intentional freeze/resume
+  }, [playing, rawIndex, length])
+
+  const setPaused = (nextPaused: boolean) => {
+    if (nextPaused === paused) return
+
+    if (nextPaused && animStartedAtRef.current != null) {
+      const elapsed = performance.now() - animStartedAtRef.current
+      setProgress(Math.min(1, Math.max(0, elapsed / HERO_INTERVAL_MS)))
+    }
+
+    setPausedState(nextPaused)
+  }
 
   const goTo = (nextIndex: number) => {
     if (length === 0) return
@@ -51,5 +84,14 @@ export const useHeroSlideshow = (length: number) => {
     setRawIndex((current) => current - 1)
   }
 
-  return { index, next, prev, goTo, setPaused, reducedMotion }
+  return {
+    index,
+    progress,
+    playing,
+    next,
+    prev,
+    goTo,
+    setPaused,
+    reducedMotion,
+  }
 }

@@ -6,7 +6,7 @@ type HeroContentProps = {
 
 export const HeroContent = ({ children }: HeroContentProps) => {
   return (
-    <div className="absolute inset-x-0 bottom-0 z-10 flex flex-col items-start gap-4 px-6 pb-24 pt-40 sm:px-8 lg:max-w-3xl lg:px-10">
+    <div className="absolute inset-x-0 bottom-0 z-10 flex flex-col items-start gap-4 px-6 pb-28 pt-40 sm:px-8 sm:pb-32 lg:max-w-3xl lg:px-10">
       {children}
     </div>
   )
